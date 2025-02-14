@@ -31,9 +31,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.SpecialConstants;
 import frc.robot.commands.AlgaeIntakeCommand;
 import frc.robot.commands.AlgaeShootCommand;
 import frc.robot.commands.CoralIntakeCommand;
@@ -59,6 +62,8 @@ public class RobotContainer {
   private JoystickButton operator_aButton = new JoystickButton(m_operatorController, XboxController.Button.kA.value);
   private JoystickButton operator_yButton = new JoystickButton(m_operatorController, XboxController.Button.kY.value);
 
+  private JoystickButton operator_leftBumper = new JoystickButton(m_operatorController, XboxController.Button.kLeftBumper.value);
+
   // Subsystems
 
   private DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -78,24 +83,6 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // Elevator Command
-    m_elevatorSubsystem.setDefaultCommand(new RunCommand(
-      () -> m_elevatorSubsystem.moveElevator(
-        -MathUtil.applyDeadband(m_operatorController.getRightY(), OIConstants.kDriveDeadband)
-      ), m_elevatorSubsystem));
-
-    // Coral Manipulator Arm Command
-    m_coralSubsystem.setDefaultCommand(new RunCommand(
-      () -> m_coralSubsystem.setArmMotor(
-        -MathUtil.applyDeadband(m_operatorController.getLeftY(), OIConstants.kDriveDeadband)
-      ), m_coralSubsystem));
-
-    // Climber Command
-    m_climberSubsystem.setDefaultCommand(new RunCommand(
-      () -> m_climberSubsystem.moveClimber(
-        -MathUtil.applyDeadband(m_operatorController.getLeftX(), OIConstants.kDriveDeadband)
-      ), m_climberSubsystem));
-
     // Swerve Drive Command
     m_robotDrive.setDefaultCommand(new RunCommand(
       () -> m_robotDrive.drive(
@@ -106,6 +93,12 @@ public class RobotContainer {
       m_robotDrive));
 
   }
+
+  // Start up and set up the commands
+
+  Command liftToProcessorCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.PROCESSOR_HEIGHT), m_elevatorSubsystem);
+  //Command wristToProcessorCommand = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.PROCESSOR_ANGLE), m_coralSubsystem);
+  //ParallelCommandGroup processorCommandGroup = new ParallelCommandGroup(liftToProcessorCommand, wristToProcessorCommand);
 
   private void configureBindings() {
 
@@ -118,6 +111,9 @@ public class RobotContainer {
     operator_bButton.onTrue(new CoralShootCommand(m_coralSubsystem)); // B button Shoots Coral
     operator_xButton.onTrue(new AlgaeIntakeCommand(m_algaeSubsystem)); // X button Intakes Algae
     operator_yButton.onTrue(new AlgaeShootCommand(m_algaeSubsystem)); // Y button Shoots Algae
+
+    operator_leftBumper.onTrue(processorCommandGroup);
+    m_operatorController.button(, null)
 
   } 
 

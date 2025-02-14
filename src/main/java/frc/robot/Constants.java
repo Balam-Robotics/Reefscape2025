@@ -139,6 +139,7 @@ public final class Constants {
         public static final IdleMode kSecondaryIdleMode = IdleMode.kBrake;
 
         public static final int kMaxHeight = 0;
+        public static final int kMinHeight = 0;
     }
 
     public static final class CoralIntakeConstants {
@@ -178,6 +179,20 @@ public final class Constants {
 
         public static final double kMaxEncoderPosition = 0;
         public static final double kMinEncoderPosition = 0;
+    }
+
+    public static final class SpecialConstants {
+        public static final double PROCESSOR_HEIGHT = 0;
+        public static final double SOURCE_HEIGHT = 8.75;
+        private static final double L1_HEIGHT = 3;
+        private static final double L2_HEIGHT = 5.5;
+        private static final double L3_HEIGHT = 21.5;
+        
+        private static final double PROCESSOR_ANGLE = 0 ;
+        private static final double SOURCE_ANGLE = 0.15;
+        private static final double L1_ANGLE = 0.3;
+        private static final double L2_ANGLE = 0.225;
+        private static final double L3_ANGLE = 0.225;
     }
 
 }
