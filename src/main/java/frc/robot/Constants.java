@@ -93,8 +93,8 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final int kDriveControllerPort = 0;
-        public static final int kOperatorControllerPort = 1;
+        public static final int kDriveControllerPort = 1;
+        public static final int kOperatorControllerPort = 0;
         public static final double kDriveDeadband = 0.2;
     }
 
@@ -129,8 +129,8 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final int kPrimaryElevatorMotorId = 0;
-        public static final int kSecondaryElevatorMotorId = 0;
+        public static final int kPrimaryElevatorMotorId = 3;
+        public static final int kSecondaryElevatorMotorId = 4;
 
         public static final int kPrimaryCurrentLimit = 20;
         public static final int kSecondaryCurrentLimit = 20;
@@ -143,22 +143,22 @@ public final class Constants {
     }
 
     public static final class CoralIntakeConstants {
-        public static final int kArmMotorId = 0;
-        public static final int kRollerMotorId = 0;
+        public static final int kWristMotorId = 5;
+        public static final int kIntakeMotorId = 6;
 
-        public static final int kArmCurrentLimit = 20;
-        public static final int kRollerCurrentLimit = 20;
+        public static final int kWristCurrentLimit = 40;
+        public static final int kIntakeCurrentLimit = 15;
 
-        public static final IdleMode kArmIdleMode = IdleMode.kBrake;
-        public static final IdleMode kRollerIdleMode = IdleMode.kBrake;
+        public static final IdleMode kWristIdleMode = IdleMode.kBrake;
+        public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
 
-        public static final double kArmMaxPosition = 0;
-        public static final double kArmMinPosition = 0;
+        public static final double kWristMaxPosition = 0;
+        public static final double kWristMinPosition = 0;
     }
 
     public static final class AlgaeIntakeConstants {
-        public static final int kPrimaryMotorId = 0;
-        public static final int kSecondaryMotorId = 0;
+        public static final int kPrimaryMotorId = 7;
+        public static final int kSecondaryMotorId = 8;
 
         public static final int kPrimaryCurrentLimit = 20;
         public static final int kSecondaryCurrentLimit = 20;
@@ -168,11 +168,11 @@ public final class Constants {
     }
 
     public static final class ClimberConstants {
-        public static final int kPrimaryMotorId = 0;
-        public static final int kSecondaryMotorId = 0;
+        public static final int kPrimaryMotorId = 9;
+        public static final int kSecondaryMotorId = 13;
 
-        public static final int kPrimaryCurrentLimit = 20;
-        public static final int kSecondaryCurrentLimit = 20;
+        public static final int kPrimaryCurrentLimit = 40;
+        public static final int kSecondaryCurrentLimit = 40;
 
         public static final IdleMode kPrimaryIdleMode = IdleMode.kBrake;
         public static final IdleMode kSecondaryIdleMode = IdleMode.kBrake;
@@ -184,15 +184,15 @@ public final class Constants {
     public static final class SpecialConstants {
         public static final double PROCESSOR_HEIGHT = 0;
         public static final double SOURCE_HEIGHT = 8.75;
-        private static final double L1_HEIGHT = 3;
-        private static final double L2_HEIGHT = 5.5;
-        private static final double L3_HEIGHT = 21.5;
+        public static final double L1_HEIGHT = 3;
+        public static final double L2_HEIGHT = 5.5;
+        public static final double L3_HEIGHT = 21.5;
         
-        private static final double PROCESSOR_ANGLE = 0 ;
-        private static final double SOURCE_ANGLE = 0.15;
-        private static final double L1_ANGLE = 0.3;
-        private static final double L2_ANGLE = 0.225;
-        private static final double L3_ANGLE = 0.225;
+        public static final double PROCESSOR_ANGLE = 0;
+        public static final double SOURCE_ANGLE = 0.15;
+        public static final double L1_ANGLE = 0.3;
+        public static final double L2_ANGLE = 0.225;
+        public static final double L3_ANGLE = 0.225;
     }
 
 }

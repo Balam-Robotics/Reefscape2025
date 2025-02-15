@@ -63,12 +63,12 @@ public class AlgaeSubsystem extends SubsystemBase {
     m_secondaryMotor.set(-1);
   }
 
-  public void shootAlgae() {
+  public void ejectAlgae() {
     m_primaryMotor.set(-1);
     m_secondaryMotor.set(1);
   }
 
-  public void stopMotors() {
+  public void stopAlgae() {
     m_primaryMotor.set(0);
     m_secondaryMotor.set(0);
   }

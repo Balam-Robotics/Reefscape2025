@@ -23,7 +23,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -39,30 +39,30 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkMax m_primaryMotor;
   private SparkMax m_secondaryMotor;
 
-  private SparkAbsoluteEncoder m_primaryEncoder;
+  private AbsoluteEncoder m_primaryEncoder;
 
-  public static final SparkMaxConfig primaryElevatorConfig = new SparkMaxConfig();
-  public static final SparkMaxConfig secondaryElevatorConfig = new SparkMaxConfig();
+  public static final SparkMaxConfig primaryMotorConfig = new SparkMaxConfig();
+  public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
 
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
-
+    System.out.println("Creates a new ElevatorSubsystem");
     m_primaryMotor = new SparkMax(ElevatorConstants.kPrimaryElevatorMotorId, MotorType.kBrushless);
     m_secondaryMotor = new SparkMax(ElevatorConstants.kSecondaryElevatorMotorId, MotorType.kBrushless);
 
-    primaryElevatorConfig
+    primaryMotorConfig
       .idleMode(ElevatorConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ElevatorConstants.kPrimaryCurrentLimit);
-    primaryElevatorConfig.closedLoop
+    primaryMotorConfig.closedLoop
       .pidf(0.027, 0, 0 , 0.0085);
-    secondaryElevatorConfig
+    secondaryMotorConfig
       .follow(ElevatorConstants.kPrimaryElevatorMotorId, true) // Sepa si esto va a funcionar
       .idleMode(ElevatorConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit)
       .inverted(true);
     
-    m_primaryMotor.configure(primaryElevatorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_secondaryMotor.configure(secondaryElevatorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_primaryMotor.configure(primaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     m_primaryEncoder = m_primaryMotor.getAbsoluteEncoder();
   }

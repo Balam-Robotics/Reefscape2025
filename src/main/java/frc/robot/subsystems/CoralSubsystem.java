@@ -26,6 +26,7 @@ package frc.robot.subsystems;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -35,67 +36,60 @@ import frc.robot.Constants.CoralIntakeConstants;
 
 public class CoralSubsystem extends SubsystemBase {
 
-  private SparkMax m_armMotor;
-  private SparkMax m_rollerMotor;
+  private SparkMax m_wristMotor;
+  private SparkMax m_intakeMotor;
 
-  private AbsoluteEncoder m_armEncoder;
+  private AbsoluteEncoder m_wristEncoder;
 
-  public static final SparkMaxConfig armMotorConfig = new SparkMaxConfig();
-  public static final SparkMaxConfig rollerMotorConfig = new SparkMaxConfig();
+  public static final SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
+  public static final SparkMaxConfig intakeMotorConfig = new SparkMaxConfig();
 
   /** Creates a new CoralSubsystem. */
   public CoralSubsystem() {
 
-    m_armMotor = new SparkMax(CoralIntakeConstants.kArmMotorId, MotorType.kBrushless);
-    m_rollerMotor = new SparkMax(CoralIntakeConstants.kRollerMotorId, MotorType.kBrushless);
+    m_wristMotor = new SparkMax(CoralIntakeConstants.kWristMotorId, MotorType.kBrushless);
+    m_intakeMotor = new SparkMax(CoralIntakeConstants.kIntakeMotorId, MotorType.kBrushless);
 
-    armMotorConfig
-      .idleMode(CoralIntakeConstants.kArmIdleMode)
-      .smartCurrentLimit(CoralIntakeConstants.kArmCurrentLimit);
-    rollerMotorConfig
-      .idleMode(CoralIntakeConstants.kRollerIdleMode)
-      .smartCurrentLimit(CoralIntakeConstants.kRollerCurrentLimit);
+    wristMotorConfig
+      .idleMode(CoralIntakeConstants.kWristIdleMode)
+      .smartCurrentLimit(CoralIntakeConstants.kWristCurrentLimit);
+    wristMotorConfig.closedLoop
+      .pidf(0.55, 0, 0, 0.00375);
+    intakeMotorConfig
+      .idleMode(CoralIntakeConstants.kIntakeIdleMode)
+      .smartCurrentLimit(CoralIntakeConstants.kIntakeCurrentLimit);
 
-      m_armMotor.configure(armMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-      m_rollerMotor.configure(rollerMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      m_wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      m_intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
-  public void setArmMotor(double speed) {
-    if (speed > 0 ) {
-      if (getEncoderPosition() < CoralIntakeConstants.kArmMaxPosition) {
-        m_armMotor.set(speed);
-      } else {
-        m_armMotor.set(0);
-      }
-    } else if (speed < CoralIntakeConstants.kArmMinPosition) {
-      if (getEncoderPosition() < 0) {
-        m_armMotor.set(speed);
-      } else {
-        m_armMotor.set(0);
-      }
-    } else {
-      m_armMotor.set(0);
-    }
+  public void setWristAngle(double position) {
+    m_wristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
-  public void stopArmMotor() {
-    m_armMotor.set(0);
+
+  public void adjustWristAngle(double angleRadians) {
+    m_wristMotor.getEncoder().setPosition(getEncoderPosition() + angleRadians);
   }
 
   public void intakeCoral() {
-    m_rollerMotor.set(1);
+    m_intakeMotor.set(1);
   }
 
-  public void shootCoral() {
-    m_rollerMotor.set(-1);
+  public void ejectCoral() {
+    m_intakeMotor.set(-1);
   }
 
-  public void stopRollerMotor() {
-    m_rollerMotor.set(0);
+  public void stopCoral() {
+    m_intakeMotor.set(0);
   }
 
   public double getEncoderPosition() {
-    return m_armEncoder.getPosition();
+    return m_wristEncoder.getPosition();
+  }
+
+  public double getEncoderVelocity() {
+    return m_wristEncoder.getVelocity();
   }
 
   @Override

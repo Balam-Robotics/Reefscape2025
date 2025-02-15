@@ -32,8 +32,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
+  private final int MOTOR_GEAR_RATIO = 405;
 
   private SparkMax m_primaryMotor;
   private SparkMax m_secondaryMotor;
@@ -51,37 +53,37 @@ public class ClimberSubsystem extends SubsystemBase {
 
     primaryMotorConfig
       .idleMode(ClimberConstants.kPrimaryIdleMode)
-      .smartCurrentLimit(ClimberConstants.kPrimaryCurrentLimit);
+      .smartCurrentLimit(ClimberConstants.kPrimaryCurrentLimit)
+      .voltageCompensation(12);
+    primaryMotorConfig.absoluteEncoder
+      .positionConversionFactor(1 / MOTOR_GEAR_RATIO);
     secondaryMotorConfig
-      .follow(ClimberConstants.kPrimaryMotorId)
+      .follow(ClimberConstants.kPrimaryMotorId, true)
       .idleMode(ClimberConstants.kSecondaryIdleMode)
-      .smartCurrentLimit(ClimberConstants.kSecondaryCurrentLimit);
+      .smartCurrentLimit(ClimberConstants.kSecondaryCurrentLimit)
+      .voltageCompensation(12);
 
       m_primaryMotor.configure(primaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       m_secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
-  public void moveClimber(double speed) {
-    if (speed > 0) {
-      if (getEncoderPosition() < ClimberConstants.kMaxEncoderPosition) {
-        m_primaryMotor.set(speed);
-      }
-    } else if (speed < 0) {
-      if (getEncoderPosition() > ClimberConstants.kMinEncoderPosition) {
-        m_primaryMotor.set(speed);
-      }
-    } else {
-      m_primaryMotor.set(0);
+  public void setClimberSpeed(double speed) {
+    if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight)) {
+      m_primaryMotor.set(speed);
     }
   }
 
-  public void stopMotors() {
+  public void stopClimber() {
     m_primaryMotor.set(0);
   }
 
   public double getEncoderPosition() {
     return m_climberEncoder.getPosition();
+  }
+
+  public double getEncoderVelocity() {
+    return m_climberEncoder.getVelocity();
   }
 
   @Override
