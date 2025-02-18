@@ -27,50 +27,28 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SpecialConstants;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.Maldito;
-import frc.robot.subsystems.TestSubsystem;
 import frc.robot.subsystems.Swerve.DriveSubsystem;
 
 public class RobotContainer {
 
   // Drive Controller
 
-  //private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriveControllerPort);
+  private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriveControllerPort);
   private CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
-
-  //private Trigger driver_xButton = m_driverController.x();
-  //private Trigger driver_bButton = m_driverController.b();
-
-  private Trigger operator_xButton = m_operatorController.x();
-  private Trigger operator_yButton = m_operatorController.y();
-  private Trigger operator_bButton = m_operatorController.b();
-  private Trigger operator_aButton = m_operatorController.a();
-
-  private Trigger operator_leftBumper = m_operatorController.leftBumper();
-  private Trigger operator_leftTrigger = m_operatorController.leftTrigger();
-  private Trigger operator_leftStick = m_operatorController.leftStick();
-  private Trigger operator_startButton = m_operatorController.start();
-  private Trigger operator_POVDown = m_operatorController.povDown();
 
   // Subsystems
 
@@ -79,7 +57,6 @@ public class RobotContainer {
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
   private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-  public TestSubsystem testSubsystem = new TestSubsystem();
 
   private final SendableChooser<Command> autoChooser;
 
@@ -93,7 +70,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // Swerve Drive Command
-    /*
+    
     m_robotDrive.setDefaultCommand(new RunCommand(
       () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
@@ -101,7 +78,7 @@ public class RobotContainer {
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         false), 
       m_robotDrive));
- */
+ 
   }
 
   // Start up and set up the commands
@@ -135,8 +112,8 @@ public class RobotContainer {
   ParallelCommandGroup l3CommandGroup = new ParallelCommandGroup(liftToL3Command, wristToL3Command);  
 
   // Manual Lift
-
-  //Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(-m_operatorController.getLeftY() * 0.5), m_elevatorSubsystem);
+  Command test = Commands.runOnce(() -> System.out.println("Test"));
+  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(-m_operatorController.getLeftY() * 0.5), m_elevatorSubsystem);
 
   // Climber Commands
 
@@ -152,51 +129,37 @@ public class RobotContainer {
   // Intake Commands
 
   Command intakeCoralCommand = new StartEndCommand(() -> m_coralSubsystem.intakeCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);
-  Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);
-
-  // Test Command
-
-  Command runCommandTest = new RunCommand(() -> testSubsystem.runCommandTest(), testSubsystem);
-  Command startEndCommandTest = new StartEndCommand(() -> testSubsystem.startCommandTest(), () -> testSubsystem.endCommandTest(), testSubsystem);
-  //Command run1CommandTest = new RunCommand(() -> testSubsystem.paralelCommadnTest(), testSubsystem);
-  //Command run2CommandTest = new RunCommand(() -> testSubsystem.paralel2CommadnTest(), testSubsystem);
-  //ParallelCommandGroup paralelCommadnGroupTest = new ParallelCommandGroup(run1CommandTest, run2CommandTest);  
-
-  public Command mamada() {
-    return Commands.runOnce(() -> new PrintCommand("null"));
-  }
+  Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);  
 
   private void configureBindings() {
 
+
     // Drive Controller Bindings
-    //driver_xButton.whileTrue(new RunCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
-    //driver_bButton.onTrue(m_robotDrive.changeDriveModeCmd());
+    m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+    m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
 
+    m_driverController.povUp().whileTrue(climbUpCommand);
+    m_driverController.povDown().whileTrue(climbDownCommand);
+    m_driverController.povLeft().whileTrue(climbHoldCommand);
+
+  
     // Operator Controller Bindings
-    /*
-    operator_aButton.onTrue(new PrintCommand("A Button"));
-    operator_xButton.onTrue(new PrintCommand("X Button"));
-    operator_yButton.onTrue(new PrintCommand("Y Button"));
-    operator_bButton.onTrue(new PrintCommand("B Button"));
-    operator_leftBumper.onTrue(new PrintCommand("Left Bumper"));
-    operator_startButton.onTrue(new PrintCommand("Start Button"));
-    operator_leftTrigger.whileTrue(new PrintCommand("Left Trigger"));
-    operator_leftStick.whileTrue(new PrintCommand("Left Stick"));*/
-    operator_POVDown.whileTrue(new PrintCommand("POV Down"));
-     
 
-     //operator_aButton.onTrue(new Maldito(testSubsystem));
-     operator_xButton.onTrue(new PrintCommand("X Button"));
-     operator_xButton.onTrue(new Maldito(testSubsystem));
-     m_operatorController.leftBumper().onTrue(runCommandTest);
-     //operator_aButton.whileTrue(runCommandTest);
-     Command idiota = new PrintCommand("null");
-     Command idiota2 = new RunCommand(() -> System.out.println("FUNCIONA PTM"), testSubsystem);
-     Command idiota3 = new RunCommand(() -> new PrintCommand("null"), testSubsystem);
-     Command mad = mamada();
-    m_operatorController.b().onTrue(Commands.runOnce(() -> new PrintCommand("null").ignoringDisable(true)));
-     //operator_aButton.onTrue(mad);
-     //operator_startButton.onTrue(paralelCommadnGroupTest);
+    m_operatorController.rightBumper().whileTrue(ejectAlgaeCommand);
+    m_operatorController.rightTrigger().whileTrue(intakeAlgaeCommand);
+
+    m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
+    m_operatorController.leftTrigger().whileTrue(intakeCoralCommand);
+
+    m_operatorController.povDown().onTrue(processorCommandGroup).debounce(1);
+    m_operatorController.povLeft().onTrue(sourceCommandGroup);
+
+    m_operatorController.a().onTrue(l1CommandGroup);
+    m_operatorController.b().onTrue(l2CommandGroup);
+    m_operatorController.y().onTrue(l3CommandGroup);
+    m_operatorController.x().onTrue(test);
+
+    m_operatorController.start().whileTrue(manualLiftCommand);
 
   } 
 

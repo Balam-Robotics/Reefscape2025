@@ -59,16 +59,19 @@ public class AlgaeSubsystem extends SubsystemBase {
   }
 
   public void intakeAlgae() {
+    System.out.println("Intaking algae");
     m_primaryMotor.set(1);
     m_secondaryMotor.set(-1);
   }
 
   public void ejectAlgae() {
+    System.out.println("Ejecting algae");
     m_primaryMotor.set(-1);
     m_secondaryMotor.set(1);
   }
 
   public void stopAlgae() {
+    System.out.println("Stopping algae intake");
     m_primaryMotor.set(0);
     m_secondaryMotor.set(0);
   }

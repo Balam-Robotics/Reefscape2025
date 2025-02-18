@@ -69,12 +69,14 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public void setClimberSpeed(double speed) {
+    System.out.println("Setting climber speed to " + speed);
     if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight)) {
       m_primaryMotor.set(speed);
     }
   }
 
   public void stopClimber() {
+    System.out.println("Stopping climber");
     m_primaryMotor.set(0);
   }
 

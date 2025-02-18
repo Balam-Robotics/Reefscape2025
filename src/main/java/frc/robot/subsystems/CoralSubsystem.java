@@ -65,22 +65,27 @@ public class CoralSubsystem extends SubsystemBase {
   }
 
   public void setWristAngle(double position) {
+    System.out.println("Setting wrist angle to " + position);
     m_wristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
   public void adjustWristAngle(double angleRadians) {
+    System.out.println("Adjusting wrist angle by " + angleRadians);
     m_wristMotor.getEncoder().setPosition(getEncoderPosition() + angleRadians);
   }
 
   public void intakeCoral() {
+    System.out.println("Intaking coral");
     m_intakeMotor.set(1);
   }
 
   public void ejectCoral() {
+    System.out.println("Ejecting coral");
     m_intakeMotor.set(-1);
   }
 
   public void stopCoral() {
+    System.out.println("Stopping coral intake");
     m_intakeMotor.set(0);
   }
 

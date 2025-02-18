@@ -68,16 +68,19 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setElevatorPosition(double position) {
+    System.out.println("Moving elevator position to " + position);
     m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
   public void setElevatorSpeed(double speed) {
+    System.out.println("Changing elevator speed to " + speed);
     if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight) ) {
       m_primaryMotor.set(speed);
     }
   }
 
   public void stopElevator() {
+    System.out.println("Stopping Elevator");
     m_primaryMotor.set(0);
   }
 
