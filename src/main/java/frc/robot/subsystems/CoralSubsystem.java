@@ -54,7 +54,7 @@ public class CoralSubsystem extends SubsystemBase {
       .idleMode(CoralIntakeConstants.kWristIdleMode)
       .smartCurrentLimit(CoralIntakeConstants.kWristCurrentLimit);
     wristMotorConfig.closedLoop
-      .pidf(0.55, 0, 0, 0.00375);
+      .pidf(0.05, 0, 0, 0);
     intakeMotorConfig
       .idleMode(CoralIntakeConstants.kIntakeIdleMode)
       .smartCurrentLimit(CoralIntakeConstants.kIntakeCurrentLimit);

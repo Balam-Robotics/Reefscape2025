@@ -24,6 +24,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -40,6 +41,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkMax m_secondaryMotor;
 
   private AbsoluteEncoder m_primaryEncoder;
+  private int m_counter;  
 
   public static final SparkMaxConfig primaryMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
@@ -68,14 +70,28 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setElevatorPosition(double position) {
-    System.out.println("Moving elevator position to " + position);
-    m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
+    System.out.println("Moving elevator position to " + position +  " | Relative Encoder position " + m_primaryEncoder.getPosition());
+    //m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
-  public void setElevatorSpeed(double speed) {
+  public void xd(double speed) {
     System.out.println("Changing elevator speed to " + speed);
     if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight) ) {
       m_primaryMotor.set(speed);
+    }
+  }
+  public void setElevatorSpeed(double speed) {
+    System.out.println("Changing elevator speed to " + speed);
+        m_primaryMotor.set(speed);
+        heightController((int) Math.round(speed));
+        System.out.println("Absolute Encoder: " + getEncoderPosition() + 360 * m_counter);
+  }
+
+  public void heightController(int input) {
+    if(input > 0 && getEncoderPosition() == 360) {
+      m_counter += 1;
+    } else if(input < 0 && getEncoderPosition() == 0) {
+      m_counter += 0;
     }
   }
 
@@ -95,5 +111,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //System.out.println("Relative Encoder position " + getEncoderPosition());
   }
 }

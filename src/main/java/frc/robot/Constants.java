@@ -20,7 +20,7 @@ public final class Constants {
         public static final double kMaxAngularSpeed = 2 * Math.PI;
 
         public static final double kTrackWidth = Units.inchesToMeters(26.5);
-        public static final double kWheelBase = Units.inchesToMeters(26.5);
+        public static final double kWheelBase = Units.inchesToMeters(32);
 
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -35,15 +35,15 @@ public final class Constants {
 
         // SPARX MAX CAN ID
 
-        public static final int frontLeftDriveId = 22;
-        public static final int frontLeftTurningId = 21;
-        public static final int frontRightDriveId = 12;
-        public static final int frontRightTurningId = 11;
+        public static final int frontLeftDriveId = 32;
+        public static final int frontLeftTurningId = 31;
+        public static final int frontRightDriveId = 22;
+        public static final int frontRightTurningId = 21;
 
-        public static final int backLeftDriveId = 32;
-        public static final int backLeftTurningId = 31;
-        public static final int backRightDriveId = 2;
-        public static final int backRightTurningId = 1;
+        public static final int backLeftDriveId = 2;
+        public static final int backLeftTurningId = 1;
+        public static final int backRightDriveId = 12;
+        public static final int backRightTurningId = 11;
 
     }
 
@@ -129,8 +129,8 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final int kPrimaryElevatorMotorId = 3;
-        public static final int kSecondaryElevatorMotorId = 4;
+        public static final int kPrimaryElevatorMotorId = 51; // Left Motor looking from the battery
+        public static final int kSecondaryElevatorMotorId = 52; // Right Motor looking from the battery
 
         public static final int kPrimaryCurrentLimit = 20;
         public static final int kSecondaryCurrentLimit = 20;
@@ -138,13 +138,13 @@ public final class Constants {
         public static final IdleMode kPrimaryIdleMode = IdleMode.kBrake;
         public static final IdleMode kSecondaryIdleMode = IdleMode.kBrake;
 
-        public static final int kMaxHeight = 0;
+        public static final int kMaxHeight = -70;
         public static final int kMinHeight = 0;
     }
 
     public static final class CoralIntakeConstants {
-        public static final int kWristMotorId = 5;
-        public static final int kIntakeMotorId = 6;
+        public static final int kWristMotorId = 61;
+        public static final int kIntakeMotorId = 62;
 
         public static final int kWristCurrentLimit = 40;
         public static final int kIntakeCurrentLimit = 15;
@@ -189,10 +189,11 @@ public final class Constants {
         public static final double L3_HEIGHT = 21.5;
         
         public static final double PROCESSOR_ANGLE = 0;
-        public static final double SOURCE_ANGLE = 0.15;
-        public static final double L1_ANGLE = 0.3;
-        public static final double L2_ANGLE = 0.225;
-        public static final double L3_ANGLE = 0.225;
+        public static final double DEFAULT_ANGLE = 0.5;
+        public static final double SOURCE_ANGLE = 1.5;
+        public static final double L1_ANGLE = 4;
+        public static final double L2_ANGLE = 4;
+        public static final double L3_ANGLE = 4;
     }
 
 }

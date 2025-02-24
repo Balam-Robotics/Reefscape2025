@@ -95,6 +95,7 @@ public class DriveSubsystem extends SubsystemBase {
   // NavX Gyroscope
 
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+  
   private boolean m_isFieldOriented = true;
 
   public void changeDriveMode() {

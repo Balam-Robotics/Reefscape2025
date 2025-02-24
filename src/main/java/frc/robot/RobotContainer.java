@@ -25,6 +25,7 @@ package frc.robot;
 
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -55,7 +56,7 @@ public class RobotContainer {
   private DriveSubsystem m_robotDrive = new DriveSubsystem();
   private ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
-  private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+  //private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   private final SendableChooser<Command> autoChooser;
@@ -71,7 +72,7 @@ public class RobotContainer {
 
     // Swerve Drive Command
     
-    m_robotDrive.setDefaultCommand(new RunCommand(
+    m_robotDrive.setDefaultCommand(Commands.runOnce(
       () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
@@ -84,47 +85,49 @@ public class RobotContainer {
   // Start up and set up the commands
 
   // Processor Commands
-  Command liftToProcessorCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.PROCESSOR_HEIGHT), m_elevatorSubsystem);
-  Command wristToProcessorCommand = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.PROCESSOR_ANGLE), m_coralSubsystem);
+  Command liftToProcessorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.PROCESSOR_HEIGHT), m_elevatorSubsystem);
+  Command wristToProcessorCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.PROCESSOR_ANGLE), m_coralSubsystem);
   ParallelCommandGroup processorCommandGroup = new ParallelCommandGroup(liftToProcessorCommand, wristToProcessorCommand);
 
   // Source Commands
-  Command liftToSourceCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
-  Command wristToSourceCommand = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.SOURCE_ANGLE), m_coralSubsystem);
+  Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
+  Command wristToSourceCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.SOURCE_ANGLE), m_coralSubsystem);
   ParallelCommandGroup sourceCommandGroup = new ParallelCommandGroup(liftToSourceCommand, wristToSourceCommand);
 
   // L1 Commands
 
-  Command liftToL1Command = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L1_ANGLE), m_elevatorSubsystem);
-  Command wristToL1Command = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L1_ANGLE), m_coralSubsystem);
+  Command liftToL1Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L1_HEIGHT), m_elevatorSubsystem);
+  Command wristToL1Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L1_ANGLE), m_coralSubsystem);
   ParallelCommandGroup l1CommandGroup = new ParallelCommandGroup(liftToL1Command, wristToL1Command);  
   
   // L2 Commands
 
-  Command liftToL2Command = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L2_ANGLE), m_elevatorSubsystem);
-  Command wristToL2Command = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L2_ANGLE), m_coralSubsystem);
+  Command liftToL2Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L2_HEIGHT), m_elevatorSubsystem);
+  Command wristToL2Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L2_ANGLE), m_coralSubsystem);
   ParallelCommandGroup l2CommandGroup = new ParallelCommandGroup(liftToL2Command, wristToL2Command);  
   
   // L3 Commands
 
-  Command liftToL3Command = new RunCommand(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L3_ANGLE), m_elevatorSubsystem);
-  Command wristToL3Command = new RunCommand(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L3_ANGLE), m_coralSubsystem);
+  Command liftToL3Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L3_HEIGHT), m_elevatorSubsystem);
+  Command wristToL3Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L3_ANGLE), m_coralSubsystem);
   ParallelCommandGroup l3CommandGroup = new ParallelCommandGroup(liftToL3Command, wristToL3Command);  
 
   // Manual Lift
   Command test = Commands.runOnce(() -> System.out.println("Test"));
-  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(-m_operatorController.getLeftY() * 0.5), m_elevatorSubsystem);
+  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) * 0.5), m_elevatorSubsystem);
+  Command stopManualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
+  //Command manualLiftCommand = new StartEndCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.2) * 0.5), () -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
 
   // Climber Commands
 
-  Command climbUpCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
-  Command climbDownCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(-0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
-  Command climbHoldCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.1), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
+  //Command climbUpCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
+  //Command climbDownCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(-0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
+  //Command climbHoldCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.1), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
 
   // Algae Commands
 
-  Command intakeAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.intakeAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
-  Command ejectAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.ejectAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
+  //Command intakeAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.intakeAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
+  //Command ejectAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.ejectAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
 
   // Intake Commands
 
@@ -135,35 +138,47 @@ public class RobotContainer {
 
 
     // Drive Controller Bindings
-    m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+    m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
-
+ /*
     m_driverController.povUp().whileTrue(climbUpCommand);
     m_driverController.povDown().whileTrue(climbDownCommand);
     m_driverController.povLeft().whileTrue(climbHoldCommand);
-
+  */
   
     // Operator Controller Bindings
 
-    m_operatorController.rightBumper().whileTrue(ejectAlgaeCommand);
-    m_operatorController.rightTrigger().whileTrue(intakeAlgaeCommand);
+    //m_operatorController.rightBumper().whileTrue(ejectAlgaeCommand);
+    //m_operatorController.rightTrigger().whileTrue(intakeAlgaeCommand);
 
     m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
     m_operatorController.leftTrigger().whileTrue(intakeCoralCommand);
 
-    m_operatorController.povDown().onTrue(processorCommandGroup).debounce(1);
+    m_operatorController.povDown().onTrue(processorCommandGroup);
     m_operatorController.povLeft().onTrue(sourceCommandGroup);
-
+   
     m_operatorController.a().onTrue(l1CommandGroup);
     m_operatorController.b().onTrue(l2CommandGroup);
     m_operatorController.y().onTrue(l3CommandGroup);
     m_operatorController.x().onTrue(test);
-
+ 
     m_operatorController.start().whileTrue(manualLiftCommand);
+    m_operatorController.start().whileFalse(stopManualLiftCommand);
 
   } 
 
   private void registedCommands() {
+    /*
+    NamedCommands.registerCommand("intakeCoral", intakeCoralCommand);
+    NamedCommands.registerCommand("ejectCoral", ejectCoralCommand);
+    NamedCommands.registerCommand("intakeAlgae", intakeAlgaeCommand);
+    NamedCommands.registerCommand("ejectAlgae", ejectAlgaeCommand);
+    NamedCommands.registerCommand("l1Command", l1CommandGroup);
+    NamedCommands.registerCommand("l2Command", l2CommandGroup);
+    NamedCommands.registerCommand("l3Command", l3CommandGroup);
+    NamedCommands.registerCommand("processorCommand", processorCommandGroup);
+    NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);
+  */
   }
 
   public Command getAutonomousCommand() {
