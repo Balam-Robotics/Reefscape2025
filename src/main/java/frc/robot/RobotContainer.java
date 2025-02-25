@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SpecialConstants;
-import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -48,15 +47,14 @@ public class RobotContainer {
 
   // Drive Controller
 
-  private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriveControllerPort);
-  private CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kOperatorControllerPort);
+  private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kOperatorControllerPort : OIConstants.kDriveControllerPort);
+  private CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kDriveControllerPort : OIConstants.kOperatorControllerPort);
 
   // Subsystems
 
   private DriveSubsystem m_robotDrive = new DriveSubsystem();
   private ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
-  //private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   private final SendableChooser<Command> autoChooser;
@@ -83,11 +81,6 @@ public class RobotContainer {
   }
 
   // Start up and set up the commands
-
-  // Processor Commands
-  Command liftToProcessorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.PROCESSOR_HEIGHT), m_elevatorSubsystem);
-  Command wristToProcessorCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.PROCESSOR_ANGLE), m_coralSubsystem);
-  ParallelCommandGroup processorCommandGroup = new ParallelCommandGroup(liftToProcessorCommand, wristToProcessorCommand);
 
   // Source Commands
   Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
@@ -116,18 +109,14 @@ public class RobotContainer {
   Command test = Commands.runOnce(() -> System.out.println("Test"));
   Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) * 0.5), m_elevatorSubsystem);
   Command stopManualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
+  Command pidLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setShuffleboardPIDElevator(), m_elevatorSubsystem);
   //Command manualLiftCommand = new StartEndCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.2) * 0.5), () -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
 
   // Climber Commands
 
-  //Command climbUpCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
-  //Command climbDownCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(-0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
-  //Command climbHoldCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.1), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
-
-  // Algae Commands
-
-  //Command intakeAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.intakeAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
-  //Command ejectAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.ejectAlgae(), () -> m_algaeSubsystem.stopAlgae(), m_algaeSubsystem);
+  Command climbUpCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
+  Command climbDownCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(-0.3), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
+  Command climbHoldCommand = new StartEndCommand(() -> m_climberSubsystem.setClimberSpeed(0.1), () -> m_climberSubsystem.stopClimber(), m_climberSubsystem);
 
   // Intake Commands
 
@@ -140,21 +129,16 @@ public class RobotContainer {
     // Drive Controller Bindings
     m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
- /*
+ 
     m_driverController.povUp().whileTrue(climbUpCommand);
     m_driverController.povDown().whileTrue(climbDownCommand);
-    m_driverController.povLeft().whileTrue(climbHoldCommand);
-  */
+    //m_driverController.povLeft().whileTrue(climbHoldCommand);
   
     // Operator Controller Bindings
-
-    //m_operatorController.rightBumper().whileTrue(ejectAlgaeCommand);
-    //m_operatorController.rightTrigger().whileTrue(intakeAlgaeCommand);
 
     m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
     m_operatorController.leftTrigger().whileTrue(intakeCoralCommand);
 
-    m_operatorController.povDown().onTrue(processorCommandGroup);
     m_operatorController.povLeft().onTrue(sourceCommandGroup);
    
     m_operatorController.a().onTrue(l1CommandGroup);
@@ -164,6 +148,7 @@ public class RobotContainer {
  
     m_operatorController.start().whileTrue(manualLiftCommand);
     m_operatorController.start().whileFalse(stopManualLiftCommand);
+    m_operatorController.back().whileTrue(pidLiftCommand);
 
   } 
 

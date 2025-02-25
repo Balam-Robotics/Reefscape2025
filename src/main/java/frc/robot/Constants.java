@@ -93,8 +93,9 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final int kDriveControllerPort = 1;
-        public static final int kOperatorControllerPort = 0;
+        public static final boolean kDebug = true;
+        public static final int kDriveControllerPort = 0;
+        public static final int kOperatorControllerPort = 1;
         public static final double kDriveDeadband = 0.2;
     }
 
@@ -143,8 +144,8 @@ public final class Constants {
     }
 
     public static final class CoralIntakeConstants {
-        public static final int kWristMotorId = 61;
-        public static final int kIntakeMotorId = 62;
+        public static final int kWristMotorId = 41;
+        public static final int kIntakeMotorId = 42;
 
         public static final int kWristCurrentLimit = 40;
         public static final int kIntakeCurrentLimit = 15;
@@ -156,20 +157,9 @@ public final class Constants {
         public static final double kWristMinPosition = 0;
     }
 
-    public static final class AlgaeIntakeConstants {
-        public static final int kPrimaryMotorId = 7;
-        public static final int kSecondaryMotorId = 8;
-
-        public static final int kPrimaryCurrentLimit = 20;
-        public static final int kSecondaryCurrentLimit = 20;
-
-        public static final IdleMode kPrimaryIdleMode = IdleMode.kBrake;
-        public static final IdleMode kSecondaryIdleMode = IdleMode.kBrake;
-    }
-
     public static final class ClimberConstants {
-        public static final int kPrimaryMotorId = 9;
-        public static final int kSecondaryMotorId = 13;
+        public static final int kPrimaryMotorId = 61;
+        public static final int kSecondaryMotorId = 62;
 
         public static final int kPrimaryCurrentLimit = 40;
         public static final int kSecondaryCurrentLimit = 40;
@@ -182,13 +172,11 @@ public final class Constants {
     }
 
     public static final class SpecialConstants {
-        public static final double PROCESSOR_HEIGHT = 0;
-        public static final double SOURCE_HEIGHT = 8.75;
-        public static final double L1_HEIGHT = 3;
-        public static final double L2_HEIGHT = 5.5;
-        public static final double L3_HEIGHT = 21.5;
+        public static final double SOURCE_HEIGHT = -20;
+        public static final double L1_HEIGHT = -10;
+        public static final double L2_HEIGHT = -43;
+        public static final double L3_HEIGHT = -70;
         
-        public static final double PROCESSOR_ANGLE = 0;
         public static final double DEFAULT_ANGLE = 0.5;
         public static final double SOURCE_ANGLE = 1.5;
         public static final double L1_ANGLE = 4;

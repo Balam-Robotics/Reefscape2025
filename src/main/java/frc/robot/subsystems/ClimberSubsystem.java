@@ -61,6 +61,7 @@ public class ClimberSubsystem extends SubsystemBase {
       .follow(ClimberConstants.kPrimaryMotorId, true)
       .idleMode(ClimberConstants.kSecondaryIdleMode)
       .smartCurrentLimit(ClimberConstants.kSecondaryCurrentLimit)
+      .inverted(true)
       .voltageCompensation(12);
 
       m_primaryMotor.configure(primaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -68,11 +69,16 @@ public class ClimberSubsystem extends SubsystemBase {
 
   }
 
-  public void setClimberSpeed(double speed) {
+  public void xd(double speed) {
     System.out.println("Setting climber speed to " + speed);
     if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight)) {
       m_primaryMotor.set(speed);
     }
+  }
+
+  public void setClimberSpeed(double speed) {
+    System.out.println("Setting climber speed to " + speed);
+    m_primaryMotor.set(speed);
   }
 
   public void stopClimber() {
