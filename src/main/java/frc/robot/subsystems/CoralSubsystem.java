@@ -51,6 +51,7 @@ public class CoralSubsystem extends SubsystemBase {
     m_intakeMotor = new SparkMax(CoralIntakeConstants.kIntakeMotorId, MotorType.kBrushless);
 
     wristMotorConfig
+    
       .idleMode(CoralIntakeConstants.kWristIdleMode)
       .smartCurrentLimit(CoralIntakeConstants.kWristCurrentLimit);
     wristMotorConfig.closedLoop

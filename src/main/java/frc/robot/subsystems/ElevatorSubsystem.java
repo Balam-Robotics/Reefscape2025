@@ -59,7 +59,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       .idleMode(ElevatorConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ElevatorConstants.kPrimaryCurrentLimit);
     primaryMotorConfig.closedLoop
-      .pidf(0.005, 0, 0 , 0);
+      .pidf(0.05, 0, 0 , 0);
     secondaryMotorConfig
       .follow(ElevatorConstants.kPrimaryElevatorMotorId, true) // Sepa si esto va a funcionar
       .idleMode(ElevatorConstants.kPrimaryIdleMode)

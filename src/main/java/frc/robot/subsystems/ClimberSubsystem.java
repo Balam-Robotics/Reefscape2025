@@ -40,8 +40,6 @@ public class ClimberSubsystem extends SubsystemBase {
   private SparkMax m_primaryMotor;
   private SparkMax m_secondaryMotor;
 
-  private AbsoluteEncoder m_climberEncoder;
-
   public static final SparkMaxConfig primaryMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
 
@@ -55,8 +53,8 @@ public class ClimberSubsystem extends SubsystemBase {
       .idleMode(ClimberConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ClimberConstants.kPrimaryCurrentLimit)
       .voltageCompensation(12);
-    primaryMotorConfig.absoluteEncoder
-      .positionConversionFactor(1 / MOTOR_GEAR_RATIO);
+    //primaryMotorConfig.absoluteEncoder
+    //  .positionConversionFactor(1 / MOTOR_GEAR_RATIO);
     secondaryMotorConfig
       .follow(ClimberConstants.kPrimaryMotorId, true)
       .idleMode(ClimberConstants.kSecondaryIdleMode)
@@ -69,13 +67,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
   }
 
-  public void xd(double speed) {
-    System.out.println("Setting climber speed to " + speed);
-    if ((speed < 0 && getEncoderPosition() >= ElevatorConstants.kMinHeight) || (speed > 0 && getEncoderPosition() <= ElevatorConstants.kMaxHeight)) {
-      m_primaryMotor.set(speed);
-    }
-  }
-
   public void setClimberSpeed(double speed) {
     System.out.println("Setting climber speed to " + speed);
     m_primaryMotor.set(speed);
@@ -84,14 +75,6 @@ public class ClimberSubsystem extends SubsystemBase {
   public void stopClimber() {
     System.out.println("Stopping climber");
     m_primaryMotor.set(0);
-  }
-
-  public double getEncoderPosition() {
-    return m_climberEncoder.getPosition();
-  }
-
-  public double getEncoderVelocity() {
-    return m_climberEncoder.getVelocity();
   }
 
   @Override

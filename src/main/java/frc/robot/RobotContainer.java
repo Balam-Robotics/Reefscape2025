@@ -148,7 +148,7 @@ public class RobotContainer {
  
     m_operatorController.start().whileTrue(manualLiftCommand);
     m_operatorController.start().whileFalse(stopManualLiftCommand);
-    m_operatorController.back().whileTrue(pidLiftCommand);
+    //m_operatorController.back().whileTrue(pidLiftCommand);
 
   } 
 
