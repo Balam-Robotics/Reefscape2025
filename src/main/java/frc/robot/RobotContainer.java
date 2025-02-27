@@ -105,12 +105,19 @@ public class RobotContainer {
   Command wristToL3Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L3_ANGLE), m_coralSubsystem);
   ParallelCommandGroup l3CommandGroup = new ParallelCommandGroup(liftToL3Command, wristToL3Command);  
 
+  // Reset Elevator Position 
+
+  Command resetElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(0), m_elevatorSubsystem);
+  Command resetWristCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.DEFAULT_ANGLE), m_coralSubsystem);
+  ParallelCommandGroup resetCommandGroup = new ParallelCommandGroup(resetElevatorCommand, resetWristCommand);
+
   // Manual Lift
-  Command test = Commands.runOnce(() -> System.out.println("Test"));
-  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getLeftY(), 0.2) * 0.5), m_elevatorSubsystem);
+  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getLeftY(), OIConstants.kDriveDeadband) * 0.5), m_elevatorSubsystem);
   Command stopManualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
+
+  // PID Controllers
   Command pidLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setShuffleboardPIDElevator(), m_elevatorSubsystem);
-  //Command manualLiftCommand = new StartEndCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(-m_operatorController.getLeftY(), 0.2) * 0.5), () -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
+  Command pidWristCommand = new RunCommand(() -> m_coralSubsystem.setShuffleboardPIDWrist(), m_coralSubsystem);
 
   // Climber Commands
 
@@ -138,32 +145,34 @@ public class RobotContainer {
 
     m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
     m_operatorController.leftTrigger().whileTrue(intakeCoralCommand);
-
-    m_operatorController.povLeft().onTrue(sourceCommandGroup);
    
-    m_operatorController.a().onTrue(l1CommandGroup);
-    m_operatorController.b().onTrue(l2CommandGroup);
-    m_operatorController.y().onTrue(l3CommandGroup);
-    m_operatorController.x().onTrue(test);
- 
+    m_operatorController.y().onTrue(l3CommandGroup); // Level 3
+    m_operatorController.b().onTrue(l2CommandGroup); // Level 2
+    m_operatorController.a().onTrue(l1CommandGroup); // Level 1
+    m_operatorController.x().onTrue(resetCommandGroup); // Reset Elevator Position
+    m_operatorController.povLeft().onTrue(sourceCommandGroup); // Source Command
+
     m_operatorController.start().whileTrue(manualLiftCommand);
     m_operatorController.start().whileFalse(stopManualLiftCommand);
-    //m_operatorController.back().whileTrue(pidLiftCommand);
+    
+    if (OIConstants.kDebug) {
+      ParallelCommandGroup debugCommandGroup = new ParallelCommandGroup(pidLiftCommand, pidWristCommand);
+      m_operatorController.povUp().whileTrue(pidLiftCommand);
+      //m_operatorController.povUp().whileTrue(pidLiftCommand);
+      //m_operatorController.povDown().whileTrue(pidWristCommand);
+    }
 
   } 
 
   private void registedCommands() {
-    /*
-    NamedCommands.registerCommand("intakeCoral", intakeCoralCommand);
-    NamedCommands.registerCommand("ejectCoral", ejectCoralCommand);
-    NamedCommands.registerCommand("intakeAlgae", intakeAlgaeCommand);
-    NamedCommands.registerCommand("ejectAlgae", ejectAlgaeCommand);
+
     NamedCommands.registerCommand("l1Command", l1CommandGroup);
     NamedCommands.registerCommand("l2Command", l2CommandGroup);
     NamedCommands.registerCommand("l3Command", l3CommandGroup);
-    NamedCommands.registerCommand("processorCommand", processorCommandGroup);
-    NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);
-  */
+    NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);    
+    NamedCommands.registerCommand("intakeCoral", intakeCoralCommand);
+    NamedCommands.registerCommand("ejectCoral", ejectCoralCommand);
+  
   }
 
   public Command getAutonomousCommand() {

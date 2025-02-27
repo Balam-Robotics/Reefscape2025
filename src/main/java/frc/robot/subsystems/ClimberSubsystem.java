@@ -23,7 +23,6 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -32,10 +31,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
-import frc.robot.Constants.ElevatorConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
-  private final int MOTOR_GEAR_RATIO = 405;
 
   private SparkMax m_primaryMotor;
   private SparkMax m_secondaryMotor;
@@ -53,8 +50,6 @@ public class ClimberSubsystem extends SubsystemBase {
       .idleMode(ClimberConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ClimberConstants.kPrimaryCurrentLimit)
       .voltageCompensation(12);
-    //primaryMotorConfig.absoluteEncoder
-    //  .positionConversionFactor(1 / MOTOR_GEAR_RATIO);
     secondaryMotorConfig
       .follow(ClimberConstants.kPrimaryMotorId, true)
       .idleMode(ClimberConstants.kSecondaryIdleMode)

@@ -24,7 +24,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -33,10 +32,9 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -59,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       .idleMode(ElevatorConstants.kPrimaryIdleMode)
       .smartCurrentLimit(ElevatorConstants.kPrimaryCurrentLimit);
     primaryMotorConfig.closedLoop
-      .pidf(0.05, 0, 0 , 0);
+      .pidf(0.02, 0, 0 , 0);
     secondaryMotorConfig
       .follow(ElevatorConstants.kPrimaryElevatorMotorId, true) // Sepa si esto va a funcionar
       .idleMode(ElevatorConstants.kPrimaryIdleMode)
@@ -77,11 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
-  ShuffleboardTab tab = Shuffleboard.getTab("Elevator PID");
-   private GenericEntry shuffleBoardPos = tab.add("Position", 1).getEntry();
-   private GenericEntry kP = tab.add("kP", 1).getEntry();
-    private GenericEntry kI = tab.add("kI", 1).getEntry();
-    private GenericEntry kD = tab.add("kD", 1).getEntry();
+  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kSwerveTab.add("Elevator PID", 0).getEntry();
 
   public void setShuffleboardPIDElevator() {
     m_primaryMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0), ControlType.kPosition);

@@ -31,8 +31,10 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class CoralSubsystem extends SubsystemBase {
 
@@ -68,6 +70,12 @@ public class CoralSubsystem extends SubsystemBase {
   public void setWristAngle(double position) {
     System.out.println("Setting wrist angle to " + position);
     m_wristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
+  }
+
+  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kSwerveTab.add("Wrist PID", 0).getEntry();
+
+  public void setShuffleboardPIDWrist() {
+    m_wristMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0), ControlType.kPosition);
   }
 
   public void adjustWristAngle(double angleRadians) {
