@@ -24,10 +24,13 @@
 package frc.robot;
 
 
+import java.util.Map;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,11 +40,16 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.Constants.SpecialConstants;
+import frc.robot.commands.AutoEjectCommand;
+import frc.robot.commands.AutoIntakeCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.Swerve.DriveSubsystem;
+import frc.robot.util.CameraSystem;
+import frc.robot.util.GameTimer;
 
 public class RobotContainer {
 
@@ -57,11 +65,15 @@ public class RobotContainer {
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
+  @SuppressWarnings("unused")
+  private CameraSystem m_cameraSystem = new CameraSystem(ShuffleboardConstants.kSwerveTab);
+
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
     configureBindings();    
     registedCommands();
+    setupDriverTab();
 
     m_robotDrive.zeroHeading();
 
@@ -80,7 +92,7 @@ public class RobotContainer {
  
   }
 
-  // Start up and set up the commands
+  // Start up and set up the commands //
 
   // Source Commands
   Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
@@ -130,13 +142,28 @@ public class RobotContainer {
   Command intakeCoralCommand = new StartEndCommand(() -> m_coralSubsystem.intakeCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);
   Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);  
 
+  // Auto-Align Commands
+
+  //Command leftAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("left")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
+  //Command rightAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("right")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
+
+  Command leftAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("left")), m_robotDrive);
+  Command rightAutoAlightCommand = new RunCommand(() ->m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("right")), m_robotDrive);
+
+  //Pathplaner commands
+
+  Command resetGyroCommand = Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive);
+
   private void configureBindings() {
 
 
     // Drive Controller Bindings
-    m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive));
+    m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
  
+    m_driverController.povLeft().whileTrue(leftAutoAlightCommand);
+    m_driverController.povRight().whileTrue(rightAutoAlightCommand);
+
     m_driverController.povUp().whileTrue(climbUpCommand);
     m_driverController.povDown().whileTrue(climbDownCommand);
     //m_driverController.povLeft().whileTrue(climbHoldCommand);
@@ -153,7 +180,7 @@ public class RobotContainer {
     m_operatorController.povLeft().onTrue(sourceCommandGroup); // Source Command
 
     m_operatorController.start().whileTrue(manualLiftCommand);
-    m_operatorController.start().whileFalse(stopManualLiftCommand);
+    m_operatorController.start().whileFalse(stopManualLiftCommand);    
     
     if (OIConstants.kDebug) {
       ParallelCommandGroup debugCommandGroup = new ParallelCommandGroup(pidLiftCommand, pidWristCommand);
@@ -169,13 +196,25 @@ public class RobotContainer {
     NamedCommands.registerCommand("l1Command", l1CommandGroup);
     NamedCommands.registerCommand("l2Command", l2CommandGroup);
     NamedCommands.registerCommand("l3Command", l3CommandGroup);
-    NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);    
-    NamedCommands.registerCommand("intakeCoral", intakeCoralCommand);
-    NamedCommands.registerCommand("ejectCoral", ejectCoralCommand);
+    NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);
+    NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(3));
+    NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(1 ));
+    NamedCommands.registerCommand("resetGyro", resetGyroCommand);
   
   }
 
+  private void setupDriverTab() {
+    
+    GameTimer gameTimer = new GameTimer();
+    SendableRegistry.add(gameTimer, "Match Time");
+    ShuffleboardConstants.kSwerveTab.add(gameTimer)
+    .withWidget("Match Time")
+    .withProperties(Map.of("Font color", "black"))
+    .withSize(2, 1);
+
+  }
+
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected().withTimeout(0.2);
+    return autoChooser.getSelected();
   }
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.9955128205128205,
-        "y": 4.045641025641025
+        "x": 4.997692307692307,
+        "y": 5.387307692307693
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3246794871794867,
-        "y": 3.9011538461538464
+        "x": 5.276346153846154,
+        "y": 6.099423076923077
       },
       "isLocked": false,
-      "linkedName": "deja segundo coral"
+      "linkedName": "Source to J"
     },
     {
       "anchor": {
-        "x": 2.1492307692307686,
-        "y": 6.656730769230769
+        "x": 3.129679487179486,
+        "y": 6.078782051282051
       },
       "prevControl": {
-        "x": 2.2317948717948717,
-        "y": 6.388397435897435
+        "x": 4.915128205128205,
+        "y": 6.171666666666666
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 127.00000000000001
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "Center Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

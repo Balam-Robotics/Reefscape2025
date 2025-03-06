@@ -93,7 +93,7 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final boolean kDebug = true;
+        public static final boolean kDebug = false;
         public static final int kDriveControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
         public static final double kDriveDeadband = 0.2;
@@ -173,8 +173,8 @@ public final class Constants {
     public static final class SpecialConstants {
         public static final double SOURCE_HEIGHT = -20;
         public static final double L1_HEIGHT = 0;
-        public static final double L2_HEIGHT = -33;
-        public static final double L3_HEIGHT = -60;
+        public static final double L2_HEIGHT = -25;
+        public static final double L3_HEIGHT = -55;
         
         public static final double DEFAULT_ANGLE = 0.5;
         public static final double SOURCE_ANGLE = 1.5;

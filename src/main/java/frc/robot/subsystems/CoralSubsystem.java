@@ -46,6 +46,9 @@ public class CoralSubsystem extends SubsystemBase {
   public static final SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig intakeMotorConfig = new SparkMaxConfig();
 
+  public boolean isEjectingCoral = false;
+  public boolean isIntakingCoral = false;
+
   /** Creates a new CoralSubsystem. */
   public CoralSubsystem() {
 
@@ -73,6 +76,8 @@ public class CoralSubsystem extends SubsystemBase {
   }
 
   private GenericEntry shuffleBoardPos = ShuffleboardConstants.kSwerveTab.add("Wrist PID", 0).getEntry();
+  private GenericEntry ejectingCoralEntry = ShuffleboardConstants.kSwerveTab.add("Ejecting Coral", false).getEntry();
+  private GenericEntry intakingCoralEntry = ShuffleboardConstants.kSwerveTab.add("Intaking Coral", false).getEntry();
 
   public void setShuffleboardPIDWrist() {
     m_wristMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0), ControlType.kPosition);
@@ -85,16 +90,22 @@ public class CoralSubsystem extends SubsystemBase {
 
   public void intakeCoral() {
     System.out.println("Intaking coral");
+    isIntakingCoral = true;
+    isEjectingCoral = false;
     m_intakeMotor.set(1);
   }
 
   public void ejectCoral() {
     System.out.println("Ejecting coral");
+    isEjectingCoral = true;
+    isIntakingCoral = false;
     m_intakeMotor.set(-1);
   }
 
   public void stopCoral() {
     System.out.println("Stopping coral intake");
+    isEjectingCoral = false;
+    isIntakingCoral = false;
     m_intakeMotor.set(0);
   }
 
@@ -109,5 +120,7 @@ public class CoralSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    ejectingCoralEntry.setBoolean(isEjectingCoral);
+    intakingCoralEntry.setBoolean(isIntakingCoral);
   }
 }

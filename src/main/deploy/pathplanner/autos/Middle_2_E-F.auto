@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "prueba 1 - derecha dejar precargado"
+                  "pathName": "Middle to F"
                 }
               },
               {
@@ -24,21 +24,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.05
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "ejectCoral"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
           }
         },
         {
@@ -48,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "prueba recarga"
+                  "pathName": "F to Source"
                 }
               },
               {
@@ -67,19 +55,13 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "prueba 2"
+                  "pathName": "Source to E"
                 }
               },
               {
@@ -92,12 +74,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.05
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "ejectCoral"
@@ -106,7 +82,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "prep teleop"
+            "pathName": "E to Teleop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "resetGyro"
           }
         }
       ]
