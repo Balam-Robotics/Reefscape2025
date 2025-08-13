@@ -94,9 +94,10 @@ public final class Constants {
 
     public static final class OIConstants {
         public static final boolean kDebug = false;
+        public static final boolean kDemo = true;
         public static final int kDriveControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
-        public static final double kDriveDeadband = 0.2;
+        public static final double kDriveDeadband = 0.8; // default : 0.2
     }
 
     public static final class AutoConstants {

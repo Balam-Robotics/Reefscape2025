@@ -37,7 +37,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
@@ -81,7 +83,7 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // Swerve Drive Command
-    
+
     m_robotDrive.setDefaultCommand(Commands.runOnce(
       () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
@@ -156,18 +158,20 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-
     // Drive Controller Bindings
     m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
  
+    
+    if (OIConstants.kDemo) { return; }
+
     m_driverController.povLeft().whileTrue(leftAutoAlightCommand);
     m_driverController.povRight().whileTrue(rightAutoAlightCommand);
 
     m_driverController.povUp().whileTrue(climbUpCommand);
     m_driverController.povDown().whileTrue(climbDownCommand);
     //m_driverController.povLeft().whileTrue(climbHoldCommand);
-  
+
     // Operator Controller Bindings
 
     m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
@@ -181,7 +185,7 @@ public class RobotContainer {
 
     m_operatorController.start().whileTrue(manualLiftCommand);
     m_operatorController.start().whileFalse(stopManualLiftCommand);    
-    
+  
     if (OIConstants.kDebug) {
       ParallelCommandGroup debugCommandGroup = new ParallelCommandGroup(pidLiftCommand, pidWristCommand);
       m_operatorController.povUp().whileTrue(pidLiftCommand);
@@ -215,6 +219,13 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    if (OIConstants.kDemo) { 
+      SequentialCommandGroup prueba = new SequentialCommandGroup(liftToSourceCommand, new WaitCommand(1.5), liftToL1Command, new WaitCommand(1.5));
+      SequentialCommandGroup yes = new SequentialCommandGroup(prueba, prueba, prueba);
+
+      return yes;
+    }
+
     return autoChooser.getSelected();
   }
 }
