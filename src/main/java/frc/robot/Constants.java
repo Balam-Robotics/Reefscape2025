@@ -12,7 +12,22 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
+/**
+ * Clase que maneja todas las constantes del robot
+ * Configuracion del robot
+ * 
+ * @author BALAM 3527
+ * @version 1.7, 09/09/2025
+ * 
+ */
+
 public final class Constants {
+
+    /**
+     * Clase que maneja todas las constantes del sistema de swerve
+     * Configuracion del sistema de swerve
+     * @author REV Robotics
+     */
 
     public static final class DriveConstants {
 
@@ -46,6 +61,12 @@ public final class Constants {
         public static final int backRightTurningId = 11;
 
     }
+
+    /**
+     * Clase que maneja todas las constantes de cada modulo individual del Swerve
+     * Configuracion de cada modulo del swerve
+     * @author REV Robotics
+     */
 
     public static final class ModuleConstants {
 
@@ -92,13 +113,28 @@ public final class Constants {
 
     }
 
+    /**
+     * Clase que maneja todas las constantes del sistema de control
+     * Configuracion del sistema de control
+     * @author BALAM 3527
+     */
+
     public static final class OIConstants {
         public static final boolean kDebug = false;
-        public static final boolean kDemo = true;
+        public static final boolean kDemo = false;
+        public static final boolean kOneDriver = false;
+
         public static final int kDriveControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
+
         public static final double kDriveDeadband = 0.8; // default : 0.2
     }
+
+    /**
+     * Clase que maneja todas las constantes del autonomo
+     * Configuracion del autonomo
+     * @author BALAM 3527 & REV Robotics
+     */
 
     public static final class AutoConstants {
 
@@ -120,14 +156,32 @@ public final class Constants {
 
     }
 
-    public static final class LimelightConstants {
+    /**
+     * Clase que maneja todas las constantes del Limelight y las AprilTags
+     * Configuracion del Limelight y Camaras
+     * @author BALAM 3527
+     */
+
+    public static final class CameraConstants {
         public static final String kLimelightName = "limelight-balam";
         public static final int[] kValidAprilTagIds = {4};
     }
 
+    /**
+     * Clase que maneja todas las constantes del Shuffleboard
+     * Configuracion del Shuffleboard
+     * @author BALAM 3527
+     */
+
     public static final class ShuffleboardConstants {
         public static final ShuffleboardTab kSwerveTab = Shuffleboard.getTab("Swerve");
     }
+
+    /**
+     * Clase que maneja todas las constantes del sistema de elevador
+     * Configuracion del sistema de elevador
+     * @author BALAM 3527
+     */
 
     public static final class ElevatorConstants {
         public static final int kPrimaryElevatorMotorId = 51; // Left Motor looking from the battery
@@ -143,6 +197,12 @@ public final class Constants {
         public static final int kMinHeight = 0;
     }
 
+    /**
+     * Clase que maneja todas las constantes del sistema de intake
+     * Configuracion del sistema de intake
+     * @author BALAM 3527
+     */
+
     public static final class CoralIntakeConstants {
         public static final int kWristMotorId = 41;
         public static final int kIntakeMotorId = 42;
@@ -157,6 +217,12 @@ public final class Constants {
         public static final double kWristMinPosition = 0;
     }
 
+    /**
+     * Clase que maneja todas las constantes del sistema de escalada
+     * Configuracion del sistema de escalada
+     * @author BALAM 3527
+     */
+
     public static final class ClimberConstants {
         public static final int kPrimaryMotorId = 3;
         public static final int kSecondaryMotorId = 4;
@@ -170,6 +236,12 @@ public final class Constants {
         public static final double kMaxEncoderPosition = 0;
         public static final double kMinEncoderPosition = 0;
     }
+
+    /**
+     * Clase que maneja todas las constantes de configuracion del robot
+     * Configuracion de constantes especiales
+     * @author BALAM 3527
+     */
 
     public static final class SpecialConstants {
         public static final double SOURCE_HEIGHT = -20;

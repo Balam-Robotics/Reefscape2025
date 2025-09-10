@@ -3,21 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 /*
- 
 
+        
 
-
-
-  .______        ___       __          ___      .___  ___. 
-  |   _  \      /   \     |  |        /   \     |   \/   | 
-  |  |_)  |    /  ^  \    |  |       /  ^  \    |  \  /  | 
-  |   _  <    /  /_\  \   |  |      /  /_\  \   |  |\/|  | 
-  |  |_)  |  /  _____  \  |  `----./  _____  \  |  |  |  | 
-  |______/  /__/     \__\ |_______/__/     \__\ |__|  |__| 
-  
-
-
-
+ 888888ba   .d888888  dP         .d888888  8888ba.88ba     d8888b. 888888P d8888b. d88888P 
+ 88    `8b d8'    88  88        d8'    88  88  `8b  `8b        `88 88'         `88     d8' 
+a88aaaa8P' 88aaaaa88a 88        88aaaaa88a 88   88   88     aaad8' 88baaa. .aaadP'    d8'  
+ 88   `8b. 88     88  88        88     88  88   88   88        `88     `88 88'       d8'   
+ 88    .88 88     88  88        88     88  88   88   88        .88      88 88.      d8'    
+ 88888888P 88     88  88888888P 88     88  dP   dP   dP    d88888P d88888P Y88888P d8'     
+                                                                                           
+                                                                                           
 
 */     
 
@@ -53,14 +49,41 @@ import frc.robot.subsystems.Swerve.DriveSubsystem;
 import frc.robot.util.CameraSystem;
 import frc.robot.util.GameTimer;
 
+/**
+ * Clase que maneja todas las funciones del robot
+ * Cerebro del Robot
+ * 
+ * @author Balam 3527
+ * @version 1.14, 09/09/2025
+ *
+ * Dolor de cabeza de programar y hacer documentacion 
+ * 
+ */
+
 public class RobotContainer {
 
-  // Drive Controller
+  /**
+   * 
+   * Controladores para manejar el robot
+   * @param m_driverController Control que manjera el Swerve y Climber
+   * @param m_operatorController Control que manjera los subsistemas como Elevador y Garra
+   * 
+   */
 
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kOperatorControllerPort : OIConstants.kDriveControllerPort);
   private CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kDriveControllerPort : OIConstants.kOperatorControllerPort);
 
-  // Subsystems
+  /**
+   * 
+   * Subsistemas del Robot
+   * @param m_robotDrive Subsistema del Swerve y sus controladores
+   * @param m_elevatorSubsystem Subsistema del elevador
+   * @param m_coralSubsystem Subsistema del manipulador del Coral
+   * @param m_climberSubsystem Subsistema del climber 
+   * 
+   * @param m_cameraSystem Subsistema del sistema de camara del robot
+   * 
+   */
 
   private DriveSubsystem m_robotDrive = new DriveSubsystem();
   private ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
@@ -70,19 +93,33 @@ public class RobotContainer {
   @SuppressWarnings("unused")
   private CameraSystem m_cameraSystem = new CameraSystem(ShuffleboardConstants.kSwerveTab);
 
+  /**
+   * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
+   */
+
   private final SendableChooser<Command> autoChooser;
 
+  /**
+   * 
+   * Crea un nuevo RobotContainer que contiene todo lo necesario del robot
+   * 
+   */
+
   public RobotContainer() {
-    configureBindings();    
-    registedCommands();
-    setupDriverTab();
+    configureBindings();  // Configurar botones de Driver y Operador 
+    registedCommands(); // Registar comandos para el modo autonomo
+    setupDriverTab(); // Inicializar la pantalla del Driver en Elastic
 
-    m_robotDrive.zeroHeading();
+    m_robotDrive.zeroHeading(); // Reiniciar gyroscopio
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    autoChooser = AutoBuilder.buildAutoChooser(); // Inicializar la variable autoChooser
+    SmartDashboard.putData("Auto Chooser", autoChooser); // Misma cosa 
 
-    // Swerve Drive Command
+    /**
+     * 
+     * Funcion que manda los inputs del control m_driverController al subsistema m_robotDrive para que el robot se mueva en Modo Teleoperado
+     * 
+     */
 
     m_robotDrive.setDefaultCommand(Commands.runOnce(
       () -> m_robotDrive.drive(
@@ -94,9 +131,18 @@ public class RobotContainer {
  
   }
 
-  // Start up and set up the commands //
+  /**
+   * 
+   * Inicializar los Comandos y Grupos de Comandos del Autonomo y Teleoperado
+   *
+   * 
+   * Comandos para el Elevador
+   * 
+   * @param Command -> Comandos individuales que realizan una sola accion
+   * @param ParallelCommandGroup -> Multiples comandos al mismo tiempo para realizar mas de una accion al mismo tiempo, eg: Subir el Elevador y el Manipulador en posicion de Intake
+   * 
+   */ 
 
-  // Source Commands
   Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
   Command wristToSourceCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.SOURCE_ANGLE), m_coralSubsystem);
   ParallelCommandGroup sourceCommandGroup = new ParallelCommandGroup(liftToSourceCommand, wristToSourceCommand);
@@ -145,6 +191,7 @@ public class RobotContainer {
   Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);  
 
   // Auto-Align Commands
+  // TODO : TERMIANR COMANDOS PARA ALINEAR AUTOMATICAMENTE
 
   //Command leftAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("left")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   //Command rightAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("right")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
@@ -156,44 +203,67 @@ public class RobotContainer {
 
   Command resetGyroCommand = Commands.runOnce(() -> m_robotDrive.zeroHeading(), m_robotDrive);
 
+  /**
+   * 
+   * Confiugrar botones para el Driver y Operador
+   * 
+   */
+
   private void configureBindings() {
 
-    // Drive Controller Bindings
+    //  --- Drive Controller Bindings --- //
+
     m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
  
     
-    if (OIConstants.kDemo) { return; }
+    // TODO : Terminar el modo kDemo
+    if (OIConstants.kDemo) { return; } // Para modo de demostraciones WIP
 
     m_driverController.povLeft().whileTrue(leftAutoAlightCommand);
     m_driverController.povRight().whileTrue(rightAutoAlightCommand);
 
-    m_driverController.povUp().whileTrue(climbUpCommand);
-    m_driverController.povDown().whileTrue(climbDownCommand);
-    //m_driverController.povLeft().whileTrue(climbHoldCommand);
+    m_driverController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @DRIVER
+    m_driverController.povDown().whileTrue(climbDownCommand); // Move the climber down with the Cross Down @DRIVER
+    //m_driverController.povLeft().whileTrue(climbHoldCommand); @deprecrated
 
-    // Operator Controller Bindings
+    // --- Operator Controller Bindings --- //
 
-    m_operatorController.leftBumper().whileTrue(ejectCoralCommand);
-    m_operatorController.leftTrigger().whileTrue(intakeCoralCommand);
+    m_operatorController.leftBumper().whileTrue(ejectCoralCommand); // Eject coral with Left Bumper @OPERATOR
+    m_operatorController.leftTrigger().whileTrue(intakeCoralCommand); // Intake coral with Left Trigger @OPERATOR
    
-    m_operatorController.y().onTrue(l3CommandGroup); // Level 3
-    m_operatorController.b().onTrue(l2CommandGroup); // Level 2
-    m_operatorController.a().onTrue(l1CommandGroup); // Level 1
-    m_operatorController.x().onTrue(resetCommandGroup); // Reset Elevator Position
+    m_operatorController.y().onTrue(l3CommandGroup); // Mover elevador y manipulador  en posicion del Nivel 3 del Arecife @OPERATOR
+    m_operatorController.b().onTrue(l2CommandGroup); // Mover elevador y manipulador  en posicion del Nivel 2 del Arecife @OPERATOR
+    m_operatorController.a().onTrue(l1CommandGroup); // Mover elevador y manipulador en posicion del Nivel 1 del Arecife @OPERATOR
+    m_operatorController.x().onTrue(resetCommandGroup); // Resetear el elevador y manipulador @OPERATOR
     m_operatorController.povLeft().onTrue(sourceCommandGroup); // Source Command
 
-    m_operatorController.start().whileTrue(manualLiftCommand);
-    m_operatorController.start().whileFalse(stopManualLiftCommand);    
+    m_operatorController.start().whileTrue(manualLiftCommand); // Iniciar modo manual del elevador @OPERATOR
+    m_operatorController.start().whileFalse(stopManualLiftCommand); // Desactivar modo manual del elevador @OPERATOR
   
+    /**
+     * 
+     * Modo kDebug para pruebas de PID durante construction o pits
+     * DESACTIVAR SI O SI ANTES DE UNA MATCH O DAMOS PENA AJENA
+     * 
+     * @param kDebug
+     * @see Constants.java
+     * 
+     */
+
     if (OIConstants.kDebug) {
       ParallelCommandGroup debugCommandGroup = new ParallelCommandGroup(pidLiftCommand, pidWristCommand);
       m_operatorController.povUp().whileTrue(pidLiftCommand);
-      //m_operatorController.povUp().whileTrue(pidLiftCommand);
-      //m_operatorController.povDown().whileTrue(pidWristCommand);
     }
 
   } 
+
+  /**
+   * 
+   * Registrar comandos del robot para modo Autonomo
+   * NO TOCAR O EL AUTONOMO SE MUERE
+   * 
+   */
 
   private void registedCommands() {
 
@@ -207,6 +277,12 @@ public class RobotContainer {
   
   }
 
+  /**
+   * 
+   * Inicializar tablero en Elastic para el Driver y Operador
+   * 
+   */
+
   private void setupDriverTab() {
     
     GameTimer gameTimer = new GameTimer();
@@ -217,6 +293,15 @@ public class RobotContainer {
     .withSize(2, 1);
 
   }
+
+  /**
+   * 
+   * Funcion que selecciona el autonomo del robot
+   * En caso de que kDemo esta activo este hara un SOLO comando, DESACTIVAR ANTES DE MATCH
+   * 
+   * @return Regresa el autonomo seleccionado en el tablero Elastic 
+   * 
+   */
 
   public Command getAutonomousCommand() {
     if (OIConstants.kDemo) { 

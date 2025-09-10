@@ -43,8 +43,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -55,9 +55,39 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
+/**
+ * The DriveSubsystem class is responsible for controlling the swerve drive system of the robot.
+ * It manages the individual swerve modules, handles odometry, and provides methods for driving the robot.
+ * It also integrates with the NavX gyroscope for orientation and supports field-oriented driving.
+ * The class includes functionality for auto-alignment using a Limelight camera and publishes relevant data to NetworkTables for monitoring.
+ * It also includes integration with PathPlanner for autonomous path following.
+ * The subsystem updates its state periodically and provides commands for changing drive modes.
+ * It is designed to be used with the WPILib command-based framework.
+ * 
+ * @author BALAM 3527
+ * @version 1.24, 09/09/2025
+ *
+ * Hours Consumed Coding This: ~25
+ * 
+ */
+
 public class DriveSubsystem extends SubsystemBase {
 
-  // Create each swerve module
+  /**
+   * Swerve Modules
+   * 
+   * Each swerve module is represented by an instance of the BalamSwerveModule class.
+   * The modules are initialized with their respective drive and turning motor IDs,
+   * as well as their chassis angular offsets.
+   * 
+   * The modules are named based on their position on the robot: front left, front right,
+   * back left, and back right.
+   * 
+   * These modules are responsible for controlling the individual wheel movements,
+   * including driving and steering.
+   * 
+   * The configuration constants for each module are defined in the DriveConstants class.
+   */
 
   private final BalamSwerveModule m_frontLeft = new BalamSwerveModule(
       DriveConstants.frontLeftDriveId,
@@ -79,7 +109,19 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.backRightTurningId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  // Advantage Scope
+  /**
+   * NetworkTables Publishers
+   * 
+   * These publishers are used to send data to NetworkTables for monitoring and debugging purposes.
+   * They publish the measured states of the swerve modules, the setpoints for the swerve modules,
+   * the robot's rotation, and the robot's pose.
+   * 
+   * They utilize the NetworkTableInstance to create topics for each type of data,
+   * and they use the appropriate struct types for the data being published.
+   * 
+   * This allows for real-time monitoring of the robot's state during operation.
+   * The published data can be viewed using tools like AdvantageScope or custom dashboards.
+   */
 
   private StructArrayPublisher<SwerveModuleState> publish_SwerveStates = NetworkTableInstance.getDefault()
       .getStructArrayTopic("/SwerveModuleStates/Measured", SwerveModuleState.struct).publish();
@@ -96,12 +138,13 @@ public class DriveSubsystem extends SubsystemBase {
   final StructPublisher<Pose2d> publish_poseEstimator = NetworkTableInstance.getDefault()
       .getStructTopic("/Odometry/PoseEstimation", Pose2d.struct).publish();
 
-  // NavX Gyroscope
 
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
   private boolean m_isFieldOriented = true;
 
+
+  
   public void changeDriveMode() {
     m_isFieldOriented = !m_isFieldOriented;
   }
@@ -114,6 +157,27 @@ public class DriveSubsystem extends SubsystemBase {
 
   // private Pose2d limelightPose2d =
   // LimelightHelpers.getBotPose2d_wpiBlue("limelight-balam"); //WIP
+
+  /**
+   * Odometry and Pose Estimation
+   * 
+   * These classes track the robot's position on the field.
+   * They combine swerve module states and gyro data to produce
+   * an estimate of the robot's current pose.
+   * 
+   * - {@link SwerveDriveOdometry} maintains pose purely from kinematics
+   *   and encoder/gyro measurements. It provides a baseline position
+   *   estimate without vision corrections.
+   * 
+   * - {@link SwerveDrivePoseEstimator} extends odometry by fusing
+   *   vision measurements (e.g., AprilTags, Limelight, cameras) with
+   *   kinematics. This produces a more accurate and drift-resistant
+   *   estimate of the robot's location.
+   * 
+   * Both are initialized with a starting {@link Pose2d}, which can be set
+   * to match the robot's starting location on the field. These values
+   * can be reset at any point (e.g., at the start of autonomous).
+   */
 
   private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -155,8 +219,8 @@ public class DriveSubsystem extends SubsystemBase {
     isRotating.setBoolean(m_gyro.isRotating());
     isFieldOrientedEntry.setBoolean(m_isFieldOriented);
 
-    limeligtTXValue.setDouble(LimelightHelpers.getTX(LimelightConstants.kLimelightName));
-    limeligtTVValue.setBoolean(LimelightHelpers.getTV(LimelightConstants.kLimelightName));
+    limeligtTXValue.setDouble(LimelightHelpers.getTX(CameraConstants.kLimelightName));
+    limeligtTVValue.setBoolean(LimelightHelpers.getTV(CameraConstants.kLimelightName));
   }
 
   // ----------------- Drive Subsystem Functions -----------------
@@ -282,8 +346,8 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public ChassisSpeeds autoAlign(String direction) {
-    double tx = LimelightHelpers.getTX(LimelightConstants.kLimelightName);
-    boolean tv = LimelightHelpers.getTV(LimelightConstants.kLimelightName);
+    double tx = LimelightHelpers.getTX(CameraConstants.kLimelightName);
+    boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
     double kP_rotation = 0.02;
     double strafeSpeed = 0.5;
 

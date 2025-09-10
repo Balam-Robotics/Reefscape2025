@@ -8,7 +8,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.LimelightConstants;
+import frc.robot.Constants.CameraConstants;;
 
 @SuppressWarnings("unused")
 public class CameraSystem extends SubsystemBase {
@@ -23,13 +23,13 @@ public class CameraSystem extends SubsystemBase {
     public CameraSystem(ShuffleboardTab driverTab) {
         this.driverTab = driverTab;
 
-        nameEntry = this.driverTab.add("Camera", LimelightConstants.kLimelightName)
+        nameEntry = this.driverTab.add("Camera", CameraConstants.kLimelightName)
         .withWidget(BuiltInWidgets.kTextView)
         .withSize(1, 1)
         .getEntry();
         
         cameraServer = CameraServer.addSwitchedCamera(SERVER_NAME);
-        limelightStream = new HttpCamera(LimelightConstants.kLimelightName, "http://10.35.27.11:5800/stream.mjpg");
+        limelightStream = new HttpCamera(CameraConstants.kLimelightName, "http://10.35.27.11:5800/stream.mjpg");
         this.driverTab.add(WIDGET_NAME, cameraServer.getSource())
         .withWidget(BuiltInWidgets.kCameraStream)
         .withSize(6, 6);
