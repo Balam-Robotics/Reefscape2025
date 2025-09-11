@@ -115,9 +115,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     return m_primaryEncoder.getVelocity();
   }
 
+  public double getElevatorHeight() {
+    return getEncoderPosition() + 360 * Math.floor(getEncoderPosition() / 360);
+  }
+
+  private GenericEntry elevatorPosition = ShuffleboardConstants.kElevatorTab.add("Elevator Position", 0.0).getEntry();
+  private GenericEntry elevatorVelocity = ShuffleboardConstants.kElevatorTab.add("Elevator Velocity", 0.0).getEntry();
+  private GenericEntry elevatorHeight = ShuffleboardConstants.kElevatorTab.add("Elevator Height", 0.0).getEntry();
+  private GenericEntry primaryMotorCurrent = ShuffleboardConstants.kElevatorTab.add("Primary Motor Current", 0.0).getEntry();
+  private GenericEntry secondaryMotorCurrent = ShuffleboardConstants.kElevatorTab.add("Secondary Motor Current", 0.0).getEntry();
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //System.out.println("Relative Encoder position " + getEncoderPosition());
+    elevatorPosition.setDouble(getEncoderPosition());
+    elevatorVelocity.setDouble(getEncoderVelocity());
+    elevatorHeight.setDouble(getElevatorHeight());
+    primaryMotorCurrent.setDouble(m_primaryMotor.getOutputCurrent());
+    secondaryMotorCurrent.setDouble(m_secondaryMotor.getOutputCurrent());
   }
 }

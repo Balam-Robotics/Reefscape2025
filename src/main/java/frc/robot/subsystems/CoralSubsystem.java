@@ -23,7 +23,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -32,6 +32,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CoralIntakeConstants;
 import frc.robot.Constants.ShuffleboardConstants;
@@ -41,7 +42,8 @@ public class CoralSubsystem extends SubsystemBase {
   private SparkMax m_wristMotor;
   private SparkMax m_intakeMotor;
 
-  private AbsoluteEncoder m_wristEncoder;
+  private RelativeEncoder m_wristEncoder;
+  private RelativeEncoder m_intakeEncoder;
 
   public static final SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig intakeMotorConfig = new SparkMaxConfig();
@@ -68,6 +70,11 @@ public class CoralSubsystem extends SubsystemBase {
       m_wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       m_intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+      m_wristEncoder = m_wristMotor.getEncoder();
+      m_wristEncoder.setPosition(0);
+
+      m_intakeEncoder = m_intakeMotor.getEncoder();
+      m_intakeEncoder.setPosition(0);
   }
 
   public void setWristAngle(double position) {
@@ -75,9 +82,11 @@ public class CoralSubsystem extends SubsystemBase {
     m_wristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
-  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kSwerveTab.add("Wrist PID", 0).getEntry();
-  private GenericEntry ejectingCoralEntry = ShuffleboardConstants.kSwerveTab.add("Ejecting Coral", false).getEntry();
-  private GenericEntry intakingCoralEntry = ShuffleboardConstants.kSwerveTab.add("Intaking Coral", false).getEntry();
+  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kCoralTab.add("Wrist PID", 0).getEntry();
+  private GenericEntry ejectingCoralEntry = ShuffleboardConstants.kCoralTab.add("Ejecting Coral", false).getEntry();
+  private GenericEntry intakingCoralEntry = ShuffleboardConstants.kCoralTab.add("Intaking Coral", false).getEntry();
+  private GenericEntry wristPosition = ShuffleboardConstants.kCoralTab.add("Wrist Angle", 0.0).getEntry();
+  private GenericEntry wristVelocity = ShuffleboardConstants.kCoralTab.add("Wrist Velocity", 0.0).getEntry();
 
   public void setShuffleboardPIDWrist() {
     m_wristMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0), ControlType.kPosition);
@@ -114,7 +123,7 @@ public class CoralSubsystem extends SubsystemBase {
   }
 
   public double getEncoderVelocity() {
-    return m_wristEncoder.getVelocity();
+    return m_intakeEncoder.getVelocity();
   }
 
   @Override
@@ -122,5 +131,7 @@ public class CoralSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     ejectingCoralEntry.setBoolean(isEjectingCoral);
     intakingCoralEntry.setBoolean(isIntakingCoral);
+    wristPosition.setDouble(getEncoderPosition());
+    wristVelocity.setDouble(getEncoderVelocity());
   }
 }

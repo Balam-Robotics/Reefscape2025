@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.security.PublicKey;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -127,7 +129,7 @@ public final class Constants {
         public static final int kDriveControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
 
-        public static final double kDriveDeadband = 0.8; // default : 0.2
+        public static final double kDriveDeadband = 0.2; // default : 0.2
     }
 
     /**
@@ -175,6 +177,16 @@ public final class Constants {
 
     public static final class ShuffleboardConstants {
         public static final ShuffleboardTab kSwerveTab = Shuffleboard.getTab("Swerve");
+        public static final ShuffleboardTab kCoralTab = Shuffleboard.getTab("Coral");
+        public static final ShuffleboardTab kElevatorTab = Shuffleboard.getTab("Elevator");
+        public static final ShuffleboardTab kClimberTab = Shuffleboard.getTab("Climber");
+        public static final ShuffleboardTab kAutoTab = Shuffleboard.getTab("Swerve/Auto");
+        public static final ShuffleboardTab kCameraTab = Shuffleboard.getTab("Swerve/Camera");
+        public static final ShuffleboardTab kSpecialTab = Shuffleboard.getTab("Swerve/Special");
+        public static final ShuffleboardTab kDriverTab = Shuffleboard.getTab("Swerve/Driver");
+        public static final ShuffleboardTab kOperatorTab = Shuffleboard.getTab("Swerve/Operator");
+        public static final ShuffleboardTab kDebugTab = Shuffleboard.getTab("Swerve/Debug");
+        public static final ShuffleboardTab kTestTab = Shuffleboard.getTab("Swerve/Test");
     }
 
     /**

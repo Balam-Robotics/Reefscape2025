@@ -91,13 +91,16 @@ public class RobotContainer {
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   @SuppressWarnings("unused")
-  private CameraSystem m_cameraSystem = new CameraSystem(ShuffleboardConstants.kSwerveTab);
+  //private CameraSystem m_cameraSystem = new CameraSystem(ShuffleboardConstants.kSwerveTab);
 
   /**
    * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
    */
 
   private final SendableChooser<Command> autoChooser;
+
+  // Controlador LED
+  public final TejuinoBoard tejuino_board = new TejuinoBoard();
 
   /**
    * 
@@ -114,6 +117,10 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser(); // Inicializar la variable autoChooser
     SmartDashboard.putData("Auto Chooser", autoChooser); // Misma cosa 
+
+    tejuino_board.init(0); // Inicializar controlador LED
+    tejuino_board.all_leds_red(0); // Prender LEDs en rojo al iniciar el robot
+    tejuino_board.all_leds_blue(tejuino_board.LED_STRIP_1);
 
     /**
      * 
