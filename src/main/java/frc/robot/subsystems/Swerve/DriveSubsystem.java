@@ -23,6 +23,10 @@
 
 package frc.robot.subsystems.Swerve;
 
+import java.util.Map;
+
+import org.opencv.core.Mat;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -36,38 +40,50 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.LimelightHelpers;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
+import frc.robot.Constants.SpecialConstants;
+import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 
 /**
- * The DriveSubsystem class is responsible for controlling the swerve drive system of the robot.
- * It manages the individual swerve modules, handles odometry, and provides methods for driving the robot.
- * It also integrates with the NavX gyroscope for orientation and supports field-oriented driving.
- * The class includes functionality for auto-alignment using a Limelight camera and publishes relevant data to NetworkTables for monitoring.
+ * The DriveSubsystem class is responsible for controlling the swerve drive
+ * system of the robot.
+ * It manages the individual swerve modules, handles odometry, and provides
+ * methods for driving the robot.
+ * It also integrates with the NavX gyroscope for orientation and supports
+ * field-oriented driving.
+ * The class includes functionality for auto-alignment using a Limelight camera
+ * and publishes relevant data to NetworkTables for monitoring.
  * It also includes integration with PathPlanner for autonomous path following.
- * The subsystem updates its state periodically and provides commands for changing drive modes.
+ * The subsystem updates its state periodically and provides commands for
+ * changing drive modes.
  * It is designed to be used with the WPILib command-based framework.
  * 
  * @author BALAM 3527
  * @version 1.24, 09/09/2025
  *
- * Hours Consumed Coding This: ~25
+ *          Hours Consumed Coding This: ~25
  * 
  */
 
@@ -76,17 +92,21 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Swerve Modules
    * 
-   * Each swerve module is represented by an instance of the BalamSwerveModule class.
-   * The modules are initialized with their respective drive and turning motor IDs,
+   * Each swerve module is represented by an instance of the BalamSwerveModule
+   * class.
+   * The modules are initialized with their respective drive and turning motor
+   * IDs,
    * as well as their chassis angular offsets.
    * 
-   * The modules are named based on their position on the robot: front left, front right,
+   * The modules are named based on their position on the robot: front left, front
+   * right,
    * back left, and back right.
    * 
    * These modules are responsible for controlling the individual wheel movements,
    * including driving and steering.
    * 
-   * The configuration constants for each module are defined in the DriveConstants class.
+   * The configuration constants for each module are defined in the DriveConstants
+   * class.
    */
 
   private final BalamSwerveModule m_frontLeft = new BalamSwerveModule(
@@ -112,15 +132,18 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * NetworkTables Publishers
    * 
-   * These publishers are used to send data to NetworkTables for monitoring and debugging purposes.
-   * They publish the measured states of the swerve modules, the setpoints for the swerve modules,
+   * These publishers are used to send data to NetworkTables for monitoring and
+   * debugging purposes.
+   * They publish the measured states of the swerve modules, the setpoints for the
+   * swerve modules,
    * the robot's rotation, and the robot's pose.
    * 
    * They utilize the NetworkTableInstance to create topics for each type of data,
    * and they use the appropriate struct types for the data being published.
    * 
    * This allows for real-time monitoring of the robot's state during operation.
-   * The published data can be viewed using tools like AdvantageScope or custom dashboards.
+   * The published data can be viewed using tools like AdvantageScope or custom
+   * dashboards.
    */
 
   private StructArrayPublisher<SwerveModuleState> publish_SwerveStates = NetworkTableInstance.getDefault()
@@ -138,13 +161,20 @@ public class DriveSubsystem extends SubsystemBase {
   final StructPublisher<Pose2d> publish_poseEstimator = NetworkTableInstance.getDefault()
       .getStructTopic("/Odometry/PoseEstimation", Pose2d.struct).publish();
 
-
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
   private boolean m_isFieldOriented = true;
+  {
+    ShuffleboardConstants.kDriverTab.add("Field Oriented", m_isFieldOriented)
+    .withWidget(BuiltInWidgets.kToggleButton)
+    .withSize(2, 1)
+    .withPosition(0, 0);
+    ShuffleboardConstants.kDriverTab.add("Field Oriented Boolean", m_isFieldOriented)
+    .withWidget(BuiltInWidgets.kBooleanBox)
+    .withSize(1, 01)
+    .withPosition(0, 1);
+  }
 
-
-  
   public void changeDriveMode() {
     m_isFieldOriented = !m_isFieldOriented;
   }
@@ -166,13 +196,13 @@ public class DriveSubsystem extends SubsystemBase {
    * an estimate of the robot's current pose.
    * 
    * - {@link SwerveDriveOdometry} maintains pose purely from kinematics
-   *   and encoder/gyro measurements. It provides a baseline position
-   *   estimate without vision corrections.
+   * and encoder/gyro measurements. It provides a baseline position
+   * estimate without vision corrections.
    * 
    * - {@link SwerveDrivePoseEstimator} extends odometry by fusing
-   *   vision measurements (e.g., AprilTags, Limelight, cameras) with
-   *   kinematics. This produces a more accurate and drift-resistant
-   *   estimate of the robot's location.
+   * vision measurements (e.g., AprilTags, Limelight, cameras) with
+   * kinematics. This produces a more accurate and drift-resistant
+   * estimate of the robot's location.
    * 
    * Both are initialized with a starting {@link Pose2d}, which can be set
    * to match the robot's starting location on the field. These values
@@ -207,21 +237,6 @@ public class DriveSubsystem extends SubsystemBase {
       .getEntry();
   private GenericEntry limeligtTXValue = ShuffleboardConstants.kSwerveTab.add("Limelight TX", 0).getEntry();
   private GenericEntry limeligtTVValue = ShuffleboardConstants.kSwerveTab.add("Limelight TV", false).getEntry();
-
-  private void updateShuffleboard() {
-    isConnected.setBoolean(m_gyro.isConnected());
-    isCalibrating.setBoolean(m_gyro.isCalibrating());
-    gyroYaw.setDouble(Math.round(m_gyro.getYaw()));
-    gyroPitch.setDouble(Math.round(m_gyro.getPitch()));
-    gyroRoll.setDouble(Math.round(m_gyro.getRoll()));
-    gyroAngle.setDouble(Math.round(m_gyro.getAngle()));
-    isMoving.setBoolean(m_gyro.isMoving());
-    isRotating.setBoolean(m_gyro.isRotating());
-    isFieldOrientedEntry.setBoolean(m_isFieldOriented);
-
-    limeligtTXValue.setDouble(LimelightHelpers.getTX(CameraConstants.kLimelightName));
-    limeligtTVValue.setBoolean(LimelightHelpers.getTV(CameraConstants.kLimelightName));
-  }
 
   // ----------------- Drive Subsystem Functions -----------------
 
@@ -345,39 +360,112 @@ public class DriveSubsystem extends SubsystemBase {
     };
   }
 
-  public ChassisSpeeds autoAlign(String direction) {
+
+  // -- Auto Align with PID Controller -- //
+  
+  PIDController alignPID_STRAFE = new PIDController(1, 0.0, 0.05);
+  PIDController alignPID_FOWARD = new PIDController(1, 0, 0.05);
+  PIDController alignPID_ROTATION = new PIDController(0.05, 0, 0.001);
+  double LEFT_CORAL_OFFSET = SpecialConstants.LEFT_CORAL_OFFSET;
+  double RIGHT_CORAL_OFFSET = SpecialConstants.RIGHT_CORAL_OFFSET;
+  private GenericEntry LEFT_OFFSET, RIGHT_OFFSET;
+
+  {
+  LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
+  .withWidget(BuiltInWidgets.kNumberSlider)
+  .withSize(2, 1)
+  .withPosition(0, 0)
+  .withProperties(Map.of("min_value", -50, "max_value", 50))
+  .getEntry();
+
+  RIGHT_OFFSET = ShuffleboardConstants.kDebugTab.add("Right Coral Offset", RIGHT_CORAL_OFFSET)
+  .withWidget(BuiltInWidgets.kNumberSlider)
+  .withSize(2, 1)
+  .withPosition(0, 1)
+  .withProperties(Map.of("min_value", -50, "max_value", 50))
+  .getEntry();
+ }
+
+  public ChassisSpeeds alignWithPID(Constants.Direction direction) {
+
     double tx = LimelightHelpers.getTX(CameraConstants.kLimelightName);
     boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
-    double kP_rotation = 0.02;
-    double strafeSpeed = 0.5;
+    if (!tv) return new ChassisSpeeds(0, 0, 0);
 
-    if (!tv) {
+    double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName); System.out.println(botpose);
+    if (botpose == null || botpose.length < 2) {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    // Align with target tag
-    double rotationSpeed = -kP_rotation * tx;
-    rotationSpeed = MathUtil.clamp(rotationSpeed, -1.0, 1.0);
+    SmartDashboard.putNumber("Pose[0]", botpose[0]);
+    SmartDashboard.putNumber("Pose[1]", botpose[1]);
+    SmartDashboard.putNumber("Pose[2]", botpose[2]);
+    SmartDashboard.putNumber("Pose[3]", botpose[3]);
+    SmartDashboard.putNumber("Pose[4]", botpose[4]);
+    SmartDashboard.putNumber("Pose[5]", botpose[5]);
 
-    // Strafe to target tag
-    double strafe = 0.0;
-    if (Math.abs(tx) < 2.0) {
-
-      if (direction == "left") {
-        strafe = -strafeSpeed;
-      } else if (direction == "right") {
-        strafe = strafeSpeed;
-      }
-
+    double xMeters = botpose[0];
+    double yMeters = botpose[2];
+    
+    if (direction == Constants.Direction.RIGHT) {
+      alignPID_STRAFE.setSetpoint(OIConstants.kDebug ? RIGHT_OFFSET.getDouble(0.0) : RIGHT_CORAL_OFFSET);
+    } else if (direction == Constants.Direction.LEFT) {
+      alignPID_STRAFE.setSetpoint(OIConstants.kDebug ? LEFT_OFFSET.getDouble(0.0) : LEFT_CORAL_OFFSET);
+    }  else if (direction == Constants.Direction.CENTER) {
+      alignPID_STRAFE.setSetpoint(0.0);
     }
 
-    return new ChassisSpeeds(0.0, strafe, rotationSpeed);
+    double xSpeed = -alignPID_STRAFE.calculate(xMeters);
+    xSpeed = MathUtil.clamp(xSpeed, -0.9, 0.9);
 
+    double ySpeed = -alignPID_FOWARD.calculate(-yMeters);
+    ySpeed = MathUtil.clamp(ySpeed, -0.9, 0.9);
+    
+    double currentYaw = botpose[4];
+    double rotationSpeed = alignPID_ROTATION.calculate(currentYaw);
+    rotationSpeed = MathUtil.clamp(rotationSpeed, -0.5, 0.5);
+
+    if (alignPID_STRAFE.atSetpoint()) xSpeed = 0;
+    if (alignPID_FOWARD.atSetpoint()) ySpeed = 0;
+    if (alignPID_ROTATION.atSetpoint()) rotationSpeed = 0;
+
+    if (Math.abs(xMeters) < 0.01) xSpeed = 0;
+    if (Math.abs(yMeters - alignPID_FOWARD.getSetpoint()) < 0.02) ySpeed = 0;
+    if (Math.abs(currentYaw) < 1.0) rotationSpeed = 0;
+
+    return new ChassisSpeeds(ySpeed, xSpeed, rotationSpeed);  
   }
 
   // Drive Subsystem Constructor and Periodic
 
   public DriveSubsystem() {
+
+    // Align PID
+
+    alignPID_STRAFE.reset();
+    alignPID_STRAFE.setTolerance(0.01);
+    alignPID_STRAFE.setSetpoint(0.0);
+
+    alignPID_FOWARD.reset();
+    alignPID_FOWARD.setTolerance(0.02);
+    alignPID_FOWARD.setSetpoint(0.7);
+
+    alignPID_ROTATION.reset();
+    alignPID_ROTATION.setTolerance(1.0);
+    alignPID_ROTATION.setSetpoint(0.0);
+
+    ShuffleboardConstants.kTestTab.add("Align Strafe PID", alignPID_STRAFE)
+    .withWidget(BuiltInWidgets.kPIDController)
+    .withSize(2, 3)
+    .withPosition(0, 0);
+    ShuffleboardConstants.kTestTab.add("Align Forward PID", alignPID_FOWARD)
+    .withWidget(BuiltInWidgets.kPIDController)
+    .withSize(2, 3)
+    .withPosition(2, 0);
+    ShuffleboardConstants.kTestTab.add("Align Rotation PID", alignPID_ROTATION)
+    .withWidget(BuiltInWidgets.kPIDController)
+    .withSize(2, 3)
+    .withPosition(4, 0);
 
     // Elastic Test
 
@@ -410,21 +498,23 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     SmartDashboard.putData("Swerve Setpoints",
-      builder -> {
-        builder.setSmartDashboardType("SwerveDrive");
+        builder -> {
+          builder.setSmartDashboardType("SwerveDrive");
 
-        builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty("Front Left Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond, null);
+          builder.addDoubleProperty("Front Left Angle", () -> m_frontLeft.getSetpoints().angle.getRadians(), null);
+          builder.addDoubleProperty("Front Left Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond,
+              null);
 
-        builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond, null);
+          builder.addDoubleProperty("Front Right Angle", () -> m_frontRight.getSetpoints().angle.getRadians(), null);
+          builder.addDoubleProperty("Front Right Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond,
+              null);
 
-        builder.addDoubleProperty("Back Left Angle", () -> m_backLeft.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty("Back Left Velocity", () -> m_backLeft.getSetpoints().speedMetersPerSecond, null);
+          builder.addDoubleProperty("Back Left Angle", () -> m_backLeft.getSetpoints().angle.getRadians(), null);
+          builder.addDoubleProperty("Back Left Velocity", () -> m_backLeft.getSetpoints().speedMetersPerSecond, null);
 
-        builder.addDoubleProperty("Back Right Angle", () -> m_backRight.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty("Back Right Velocity", () -> m_backRight.getSetpoints().speedMetersPerSecond, null);
-      });
+          builder.addDoubleProperty("Back Right Angle", () -> m_backRight.getSetpoints().angle.getRadians(), null);
+          builder.addDoubleProperty("Back Right Velocity", () -> m_backRight.getSetpoints().speedMetersPerSecond, null);
+        });
 
     // Shuffleboard 2D Field
 
@@ -497,7 +587,6 @@ public class DriveSubsystem extends SubsystemBase {
     publish_robotRotation.set(getRotation2d());
     publish_robotPose.set(getPose());
     publish_poseEstimator.set(poseEstimator.getEstimatedPosition());
-    updateShuffleboard();
 
   }
 

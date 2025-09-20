@@ -26,10 +26,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -48,6 +54,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.Swerve.DriveSubsystem;
 import frc.robot.util.CameraSystem;
 import frc.robot.util.GameTimer;
+import frc.robot.util.TejuinoBoard;
 
 /**
  * Clase que maneja todas las funciones del robot
@@ -72,6 +79,7 @@ public class RobotContainer {
 
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kOperatorControllerPort : OIConstants.kDriveControllerPort);
   private CommandXboxController m_operatorController = new CommandXboxController(OIConstants.kDebug ? OIConstants.kDriveControllerPort : OIConstants.kOperatorControllerPort);
+  
 
   /**
    * 
@@ -91,7 +99,7 @@ public class RobotContainer {
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   @SuppressWarnings("unused")
-  //private CameraSystem m_cameraSystem = new CameraSystem(ShuffleboardConstants.kSwerveTab);
+  private CameraSystem m_cameraSystem = new CameraSystem();
 
   /**
    * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
@@ -109,6 +117,13 @@ public class RobotContainer {
    */
 
   public RobotContainer() {
+
+    // -- Set Up -- //
+
+    if (OIConstants.kOneDriver) {
+      m_operatorController = m_driverController;
+    }
+
     configureBindings();  // Configurar botones de Driver y Operador 
     registedCommands(); // Registar comandos para el modo autonomo
     setupDriverTab(); // Inicializar la pantalla del Driver en Elastic
@@ -134,7 +149,7 @@ public class RobotContainer {
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         false), 
-      m_robotDrive));
+      m_robotDrive).withName("Swerve Drive Command"));
  
   }
 
@@ -150,41 +165,41 @@ public class RobotContainer {
    * 
    */ 
 
-  Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem);
-  Command wristToSourceCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.SOURCE_ANGLE), m_coralSubsystem);
+  Command liftToSourceCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.SOURCE_HEIGHT), m_elevatorSubsystem).withName("Lift to Source Command");
+  Command wristToSourceCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.SOURCE_ANGLE), m_coralSubsystem).withName("Wrist to Source Command");
   ParallelCommandGroup sourceCommandGroup = new ParallelCommandGroup(liftToSourceCommand, wristToSourceCommand);
 
   // L1 Commands
 
-  Command liftToL1Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L1_HEIGHT), m_elevatorSubsystem);
-  Command wristToL1Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L1_ANGLE), m_coralSubsystem);
+  Command liftToL1Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L1_HEIGHT), m_elevatorSubsystem).withName("Lift to L1 Command");
+  Command wristToL1Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L1_ANGLE), m_coralSubsystem).withName("Wrist to L1 Command");
   ParallelCommandGroup l1CommandGroup = new ParallelCommandGroup(liftToL1Command, wristToL1Command);  
   
   // L2 Commands
 
-  Command liftToL2Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L2_HEIGHT), m_elevatorSubsystem);
-  Command wristToL2Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L2_ANGLE), m_coralSubsystem);
+  Command liftToL2Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L2_HEIGHT), m_elevatorSubsystem).withName("Lift to L2 Command");
+  Command wristToL2Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L2_ANGLE), m_coralSubsystem).withName("Wrist to L2 Command");
   ParallelCommandGroup l2CommandGroup = new ParallelCommandGroup(liftToL2Command, wristToL2Command);  
   
   // L3 Commands
 
-  Command liftToL3Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L3_HEIGHT), m_elevatorSubsystem);
-  Command wristToL3Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L3_ANGLE), m_coralSubsystem);
+  Command liftToL3Command = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.L3_HEIGHT), m_elevatorSubsystem).withName("Lift to L3 Command");
+  Command wristToL3Command = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.L3_ANGLE), m_coralSubsystem).withName("Wrist to L3 Command");
   ParallelCommandGroup l3CommandGroup = new ParallelCommandGroup(liftToL3Command, wristToL3Command);  
 
   // Reset Elevator Position 
 
-  Command resetElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(0), m_elevatorSubsystem);
-  Command resetWristCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.DEFAULT_ANGLE), m_coralSubsystem);
+  Command resetElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(0), m_elevatorSubsystem).withName("Reset Elevator Command");
+  Command resetWristCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.DEFAULT_ANGLE), m_coralSubsystem).withName("Reset Wrist Command");
   ParallelCommandGroup resetCommandGroup = new ParallelCommandGroup(resetElevatorCommand, resetWristCommand);
 
   // Manual Lift
-  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getLeftY(), OIConstants.kDriveDeadband) * 0.5), m_elevatorSubsystem);
-  Command stopManualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem);
+  Command manualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setElevatorSpeed(MathUtil.applyDeadband(m_operatorController.getRightY(), OIConstants.kDriveDeadband) * 0.5), m_elevatorSubsystem).withName("Manual Lift Command");
+  Command stopManualLiftCommand = new RunCommand(() -> m_elevatorSubsystem.stopElevator(), m_elevatorSubsystem).withName("Stop Manual Lift Command");
 
   // PID Controllers
-  Command pidLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setShuffleboardPIDElevator(), m_elevatorSubsystem);
-  Command pidWristCommand = new RunCommand(() -> m_coralSubsystem.setShuffleboardPIDWrist(), m_coralSubsystem);
+  Command pidLiftCommand = new RunCommand(() -> m_elevatorSubsystem.setShuffleboardPIDElevator(), m_elevatorSubsystem).withName("PID Elevator Command");
+  Command pidWristCommand = new RunCommand(() -> m_coralSubsystem.setShuffleboardPIDWrist(), m_coralSubsystem).withName("PID Wrist Command");
 
   // Climber Commands
 
@@ -194,8 +209,8 @@ public class RobotContainer {
 
   // Intake Commands
 
-  Command intakeCoralCommand = new StartEndCommand(() -> m_coralSubsystem.intakeCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);
-  Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem);  
+  Command intakeCoralCommand = new StartEndCommand(() -> m_coralSubsystem.intakeCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem).withName("Intake Coral Command");
+  Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem).withName("Eject Coral Command");  
 
   // Auto-Align Commands
   // TODO : TERMIANR COMANDOS PARA ALINEAR AUTOMATICAMENTE
@@ -203,8 +218,11 @@ public class RobotContainer {
   //Command leftAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("left")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   //Command rightAutoAlignCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("right")), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
 
-  Command leftAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("left")), m_robotDrive);
-  Command rightAutoAlightCommand = new RunCommand(() ->m_robotDrive.setChassisSpeed(m_robotDrive.autoAlign("right")), m_robotDrive);
+  Command leftAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.LEFT)), m_robotDrive).withName("Left Coral Auto Align");
+  Command rightAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.RIGHT)), m_robotDrive).withName("Right Coral Auto Align");
+  Command centerAutoAlignCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.CENTER)), m_robotDrive).withName("Center Coral Auto Align");
+
+  Command moveForwardCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0.3, 0, 0)), m_robotDrive);
 
   //Pathplaner commands
 
@@ -222,15 +240,12 @@ public class RobotContainer {
 
     m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading()));
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd());
- 
-    
-    // TODO : Terminar el modo kDemo
-    if (OIConstants.kDemo) { return; } // Para modo de demostraciones WIP
 
     m_driverController.povLeft().whileTrue(leftAutoAlightCommand);
     m_driverController.povRight().whileTrue(rightAutoAlightCommand);
 
-    m_driverController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @DRIVER
+    //m_driverController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @DRIVER
+    m_driverController.povUp().whileTrue(moveForwardCommand);
     m_driverController.povDown().whileTrue(climbDownCommand); // Move the climber down with the Cross Down @DRIVER
     //m_driverController.povLeft().whileTrue(climbHoldCommand); @deprecrated
 
@@ -244,9 +259,10 @@ public class RobotContainer {
     m_operatorController.a().onTrue(l1CommandGroup); // Mover elevador y manipulador en posicion del Nivel 1 del Arecife @OPERATOR
     m_operatorController.x().onTrue(resetCommandGroup); // Resetear el elevador y manipulador @OPERATOR
     m_operatorController.povLeft().onTrue(sourceCommandGroup); // Source Command
+    m_operatorController.povRight().onTrue(resetCommandGroup); // Reset
 
-    m_operatorController.start().whileTrue(manualLiftCommand); // Iniciar modo manual del elevador @OPERATOR
-    m_operatorController.start().whileFalse(stopManualLiftCommand); // Desactivar modo manual del elevador @OPERATOR
+    m_operatorController.back().whileTrue(manualLiftCommand); // Iniciar modo manual del elevador @OPERATOR
+    m_operatorController.back().whileFalse(stopManualLiftCommand); // Desactivar modo manual del elevador @OPERATOR
   
     /**
      * 
@@ -259,8 +275,8 @@ public class RobotContainer {
      */
 
     if (OIConstants.kDebug) {
-      ParallelCommandGroup debugCommandGroup = new ParallelCommandGroup(pidLiftCommand, pidWristCommand);
       m_operatorController.povUp().whileTrue(pidLiftCommand);
+      m_operatorController.povDown().whileTrue(pidWristCommand);
     }
 
   } 
@@ -281,7 +297,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(3));
     NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(1 ));
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
-  
+    
   }
 
   /**
@@ -289,6 +305,8 @@ public class RobotContainer {
    * Inicializar tablero en Elastic para el Driver y Operador
    * 
    */
+
+   PowerDistribution pdh = new PowerDistribution(63, PowerDistribution.ModuleType.kRev);
 
   private void setupDriverTab() {
     
@@ -298,6 +316,15 @@ public class RobotContainer {
     .withWidget("Match Time")
     .withProperties(Map.of("Font color", "black"))
     .withSize(2, 1);
+
+    ShuffleboardConstants.kDebugTab.add("Command Scheduler", CommandScheduler.getInstance())
+    .withSize(2, 3)
+    .withPosition(4, 0);;
+
+    ShuffleboardConstants.kDebugTab.add("Power Distribution Hub", pdh)
+    .withWidget(BuiltInWidgets.kPowerDistribution)
+    .withSize(3, 4)
+    .withPosition(6, 0);
 
   }
 
@@ -318,6 +345,7 @@ public class RobotContainer {
       return yes;
     }
 
-    return autoChooser.getSelected();
+    return centerAutoAlignCommand;
+    //return autoChooser.getSelected();
   }
 }

@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.security.PublicKey;
-
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -122,7 +120,7 @@ public final class Constants {
      */
 
     public static final class OIConstants {
-        public static final boolean kDebug = false;
+        public static final boolean kDebug = true;
         public static final boolean kDemo = false;
         public static final boolean kOneDriver = false;
 
@@ -183,10 +181,10 @@ public final class Constants {
         public static final ShuffleboardTab kAutoTab = Shuffleboard.getTab("Swerve/Auto");
         public static final ShuffleboardTab kCameraTab = Shuffleboard.getTab("Swerve/Camera");
         public static final ShuffleboardTab kSpecialTab = Shuffleboard.getTab("Swerve/Special");
-        public static final ShuffleboardTab kDriverTab = Shuffleboard.getTab("Swerve/Driver");
+        public static final ShuffleboardTab kDriverTab = Shuffleboard.getTab("Driver");
         public static final ShuffleboardTab kOperatorTab = Shuffleboard.getTab("Swerve/Operator");
-        public static final ShuffleboardTab kDebugTab = Shuffleboard.getTab("Swerve/Debug");
-        public static final ShuffleboardTab kTestTab = Shuffleboard.getTab("Swerve/Test");
+        public static final ShuffleboardTab kDebugTab = Shuffleboard.getTab("Debug");
+        public static final ShuffleboardTab kTestTab = Shuffleboard.getTab("Test");
     }
 
     /**
@@ -227,6 +225,10 @@ public final class Constants {
 
         public static final double kWristMaxPosition = 0;
         public static final double kWristMinPosition = 0;
+
+        public static final double kWristPIDkP = 0.05;
+        public static final double kWristPIDkI = 0;
+        public static final double kWristPIDkD = 0;
     }
 
     /**
@@ -266,6 +268,18 @@ public final class Constants {
         public static final double L1_ANGLE = 4;
         public static final double L2_ANGLE = 4;
         public static final double L3_ANGLE = 4;
+
+        public static final double RIGHT_CORAL_OFFSET = 0.25;
+        public static final double LEFT_CORAL_OFFSET = -0.2;
+    }
+
+    /**
+     * Enum to represent LEFT and RIGHT directions
+     */
+    public enum Direction {
+        LEFT,
+        RIGHT,
+        CENTER
     }
 
 }

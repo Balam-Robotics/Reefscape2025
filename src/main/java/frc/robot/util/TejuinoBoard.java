@@ -57,7 +57,7 @@
  ===============================================
  */
 //Compiled for WPILib 2024.2.1
-package frc.robot;
+package frc.robot.util;
 import edu.wpi.first.hal.CANAPIJNI;
 
 public class TejuinoBoard {
