@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.util.Elastic;
+import frc.robot.util.ElasticNotification;
 import frc.robot.util.TejuinoBoard;
 
 public class Robot extends TimedRobot {
@@ -48,9 +49,9 @@ public class Robot extends TimedRobot {
     ledChooser.addOption("Blue", () -> LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1));
     ledChooser.addOption("Green", () -> LED_CONTROL.all_leds_green(LED_CONTROL.LED_STRIP_1));
     ledChooser.addOption("Rainbow", () -> LED_CONTROL.rainbow_effect(LED_CONTROL.LED_STRIP_1));
-    ShuffleboardConstants.kSwerveTab.add("LED Mode", ledChooser)
-    .withSize(2, 1)
-    .withPosition(1, 0);
+    ShuffleboardConstants.kDriverTab.add("LED Mode", ledChooser)
+    .withSize(3,1)
+    .withPosition(8, 1);
   }
 
   @Override
@@ -75,7 +76,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    Elastic.selectTab("Test");
+    Elastic.selectTab("Autonomous");
+    ElasticNotification.sendNotification(notification, "Autonomous Init", "Autonomous mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
     LED_CONTROL.all_leds_white(LED_CONTROL.LED_STRIP_1);
   }
 
@@ -96,8 +98,10 @@ public class Robot extends TimedRobot {
     }
     if (OIConstants.kDebug) {
       Elastic.selectTab("Debug");
+      ElasticNotification.sendNotification(notification, "Teleop Init (DEBUG)", "Teleoperated  DEBUG mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
     } else {
       Elastic.selectTab("Driver");
+      ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
     }
 
     var alliance = DriverStation.getAlliance();

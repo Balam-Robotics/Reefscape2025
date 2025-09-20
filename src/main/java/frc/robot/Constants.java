@@ -120,7 +120,7 @@ public final class Constants {
      */
 
     public static final class OIConstants {
-        public static final boolean kDebug = true;
+        public static final boolean kDebug = false;
         public static final boolean kDemo = false;
         public static final boolean kOneDriver = false;
 
@@ -269,8 +269,14 @@ public final class Constants {
         public static final double L2_ANGLE = 4;
         public static final double L3_ANGLE = 4;
 
+    }
+
+    public static final class AutoAlignConstants {
         public static final double RIGHT_CORAL_OFFSET = 0.25;
         public static final double LEFT_CORAL_OFFSET = -0.2;
+
+        public static final double MAX_SPEED = 1;
+        public static final double MAX_ROTATION_SPEED = 0.5;
     }
 
     /**

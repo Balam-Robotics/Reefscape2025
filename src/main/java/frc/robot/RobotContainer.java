@@ -27,13 +27,12 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -99,7 +98,7 @@ public class RobotContainer {
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   @SuppressWarnings("unused")
-  private CameraSystem m_cameraSystem = new CameraSystem();
+  //private CameraSystem m_cameraSystem = new CameraSystem();
 
   /**
    * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
@@ -126,12 +125,14 @@ public class RobotContainer {
 
     configureBindings();  // Configurar botones de Driver y Operador 
     registedCommands(); // Registar comandos para el modo autonomo
-    setupDriverTab(); // Inicializar la pantalla del Driver en Elastic
+    setupElastic(); // Inicializar la pantalla del Driver en Elastic
 
     m_robotDrive.zeroHeading(); // Reiniciar gyroscopio
 
     autoChooser = AutoBuilder.buildAutoChooser(); // Inicializar la variable autoChooser
-    SmartDashboard.putData("Auto Chooser", autoChooser); // Misma cosa 
+    ShuffleboardConstants.kDriverTab.add("Autonomous Selector", autoChooser)
+    .withSize(3,1)
+    .withPosition(8, 0);
 
     tejuino_board.init(0); // Inicializar controlador LED
     tejuino_board.all_leds_red(0); // Prender LEDs en rojo al iniciar el robot
@@ -306,21 +307,36 @@ public class RobotContainer {
    * 
    */
 
-   PowerDistribution pdh = new PowerDistribution(63, PowerDistribution.ModuleType.kRev);
+   PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev); // DEFAULT 63, PUT 1 OTHERWISE THE SIMULATOR FUCKIGN CRASHES
 
-  private void setupDriverTab() {
+  private void setupElastic() {
+
+    // --- Drive Tab --- //
     
     GameTimer gameTimer = new GameTimer();
     SendableRegistry.add(gameTimer, "Match Time");
-    ShuffleboardConstants.kSwerveTab.add(gameTimer)
+    ShuffleboardConstants.kDriverTab.add(gameTimer)
     .withWidget("Match Time")
     .withProperties(Map.of("Font color", "black"))
-    .withSize(2, 1);
+    .withSize(2, 1)
+    .withPosition(4, 4);
+
+    ShuffleboardLayout robotSubsystems = ShuffleboardConstants.kDriverTab
+    .getLayout("Robot Subsystems", BuiltInLayouts.kList)
+    .withSize(2, 4)
+    .withPosition(0, 0);
+
+    robotSubsystems.add(m_robotDrive);
+    robotSubsystems.add(m_coralSubsystem);
+    robotSubsystems.add(m_elevatorSubsystem);
+    robotSubsystems.add(m_climberSubsystem);
+
+    // --- Debug Tab --- //
 
     ShuffleboardConstants.kDebugTab.add("Command Scheduler", CommandScheduler.getInstance())
     .withSize(2, 3)
     .withPosition(4, 0);;
-
+    
     ShuffleboardConstants.kDebugTab.add("Power Distribution Hub", pdh)
     .withWidget(BuiltInWidgets.kPowerDistribution)
     .withSize(3, 4)
