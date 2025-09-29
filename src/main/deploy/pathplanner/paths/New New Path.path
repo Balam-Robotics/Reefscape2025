@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.028653846153846,
-        "y": 2.776217948717948
+        "x": 3.681292808219178,
+        "y": 5.38482448630137
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.040064102564101,
-        "y": 1.5893589743589736
+        "x": 2.7346746575342467,
+        "y": 5.805543664383562
       },
       "isLocked": false,
-      "linkedName": "Source to E"
+      "linkedName": "balam_dejar"
     },
     {
       "anchor": {
-        "x": 2.180192307692307,
-        "y": 2.9413461538461534
+        "x": 1.8181078767123287,
+        "y": 5.1293878424657535
       },
       "prevControl": {
-        "x": 3.686987179487179,
-        "y": 1.868012820512821
+        "x": 2.389083904109589,
+        "y": 6.076005993150685
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "balam_recibir"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -108.69898280418114
   },
   "reversed": false,
-  "folder": "Center Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -66.57130719125452
   },
   "useDefaultConstraints": true
 }

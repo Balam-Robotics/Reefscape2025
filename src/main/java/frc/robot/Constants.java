@@ -123,11 +123,23 @@ public final class Constants {
         public static final boolean kDebug = false;
         public static final boolean kDemo = false;
         public static final boolean kOneDriver = false;
+        public static final boolean kLEDController = false;
 
         public static final int kDriveControllerPort = 0;
         public static final int kOperatorControllerPort = 1;
 
         public static final double kDriveDeadband = 0.2; // default : 0.2
+    }
+    public enum SubsystemStatus {
+        ONLINE,
+        OFFLINE,
+        MAINTENACNCE
+    }
+    public static final class SubsystemStatuses {
+        public static final SubsystemStatus kSwerve = SubsystemStatus.ONLINE;
+        public static final SubsystemStatus kElevator = SubsystemStatus.ONLINE;
+        public static final SubsystemStatus kCoralIntake = SubsystemStatus.ONLINE;
+        public static final SubsystemStatus kClimber = SubsystemStatus.MAINTENACNCE;
     }
 
     /**
@@ -194,8 +206,8 @@ public final class Constants {
      */
 
     public static final class ElevatorConstants {
-        public static final int kPrimaryElevatorMotorId = 51; // Left Motor looking from the battery
-        public static final int kSecondaryElevatorMotorId = 52; // Right Motor looking from the battery
+        public static final int kPrimaryElevatorMotorId = 52; // Left Motor looking from the battery
+        public static final int kSecondaryElevatorMotorId = 51; // Right Motor looking from the battery
 
         public static final int kPrimaryCurrentLimit = 20;
         public static final int kSecondaryCurrentLimit = 20;
@@ -258,13 +270,13 @@ public final class Constants {
      */
 
     public static final class SpecialConstants {
-        public static final double SOURCE_HEIGHT = -20;
+        public static final double SOURCE_HEIGHT = 21.5; // 20
         public static final double L1_HEIGHT = 0;
-        public static final double L2_HEIGHT = -25;
-        public static final double L3_HEIGHT = -55;
+        public static final double L2_HEIGHT = 34;
+        public static final double L3_HEIGHT = 55;
         
-        public static final double DEFAULT_ANGLE = 0.5;
-        public static final double SOURCE_ANGLE = 1.5;
+        public static final double DEFAULT_ANGLE = 0;
+        public static final double SOURCE_ANGLE = 1.2; // 1.5
         public static final double L1_ANGLE = 4;
         public static final double L2_ANGLE = 4;
         public static final double L3_ANGLE = 4;
@@ -273,7 +285,7 @@ public final class Constants {
 
     public static final class AutoAlignConstants {
         public static final double RIGHT_CORAL_OFFSET = 0.25;
-        public static final double LEFT_CORAL_OFFSET = -0.2;
+        public static final double LEFT_CORAL_OFFSET = 0;
 
         public static final double MAX_SPEED = 1;
         public static final double MAX_ROTATION_SPEED = 0.5;

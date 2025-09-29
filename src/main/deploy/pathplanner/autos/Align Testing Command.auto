@@ -1,0 +1,62 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "sourceCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ejectCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New Path"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "l2Command"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRightCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForwardCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -31,8 +31,10 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
 
     //CameraServer.startAutomaticCapture(); // Start USB Camera
-    LED_CONTROL = m_robotContainer.tejuino_board; // Start LED Controller
-    LED_CONTROL.escuderia_effect(LED_CONTROL.LED_STRIP_0);
+    if (OIConstants.kLEDController) {
+      LED_CONTROL = m_robotContainer.tejuino_board; // Start LED Controller
+      LED_CONTROL.escuderia_effect(LED_CONTROL.LED_STRIP_0);
+    }
 
     Elastic.sendNotification(notification
     .withLevel(Elastic.NotificationLevel.INFO)
@@ -40,7 +42,9 @@ public class Robot extends TimedRobot {
     .withDescription("Robot initialized successfully.")
     .withDisplaySeconds(5.0)
     );
-    confiureChoosers();
+    if (OIConstants.kLEDController) {
+      confiureChoosers();
+    }
   }
 
   public void confiureChoosers() {
@@ -57,7 +61,9 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    ledChooser.getSelected().run();
+    if (OIConstants.kLEDController) {
+      ledChooser.getSelected().run();
+    }
   }
 
   @Override
@@ -76,9 +82,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    Elastic.selectTab("Autonomous");
+    Elastic.selectTab("Driver");
     ElasticNotification.sendNotification(notification, "Autonomous Init", "Autonomous mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
-    LED_CONTROL.all_leds_white(LED_CONTROL.LED_STRIP_1);
+    if (OIConstants.kLEDController) {
+      LED_CONTROL.all_leds_white(LED_CONTROL.LED_STRIP_1);
+    }
   }
 
   @Override
@@ -104,11 +112,13 @@ public class Robot extends TimedRobot {
       ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
     }
 
-    var alliance = DriverStation.getAlliance();
-    if (alliance.get() == DriverStation.Alliance.Red) {
-      LED_CONTROL.all_leds_red(LED_CONTROL.LED_STRIP_1);
-    } else if (alliance.get() == DriverStation.Alliance.Blue) {
-      LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1);
+    if (OIConstants.kLEDController) {
+      var alliance = DriverStation.getAlliance();
+      if (alliance.get() == DriverStation.Alliance.Red) {
+        LED_CONTROL.all_leds_red(LED_CONTROL.LED_STRIP_1);
+      } else if (alliance.get() == DriverStation.Alliance.Blue) {
+        LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1);
+      }
     }
 
   }
@@ -120,7 +130,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopExit() {
-    LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1);}
+    if (OIConstants.kLEDController) {
+      LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1);
+    }
+  }
 
   @Override
   public void testInit() {

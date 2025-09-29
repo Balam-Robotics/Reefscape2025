@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -352,13 +351,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   // -- Auto Align with PID Controller -- //
   
-  PIDController alignPID_STRAFE = new PIDController(1, 0.0, 0.05);
-  PIDController alignPID_FOWARD = new PIDController(1, 0, 0.05);
-  PIDController alignPID_ROTATION = new PIDController(0.05, 0, 0.001);
+  PIDController alignPID_STRAFE = new PIDController(2.5, 0.05, 0.001);
+  PIDController alignPID_FOWARD = new PIDController(2, 0, 0.1);
+  PIDController alignPID_ROTATION = new PIDController(0.1, 0, 0);
   double LEFT_CORAL_OFFSET = AutoAlignConstants.LEFT_CORAL_OFFSET;
   double RIGHT_CORAL_OFFSET = AutoAlignConstants.RIGHT_CORAL_OFFSET;
   private GenericEntry LEFT_OFFSET, RIGHT_OFFSET;
-  final double MECHANISM_X_OFFSET = -0.25; // meters
+  final double MECHANISM_X_OFFSET = 0.25; // meters
 
   {
   LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
@@ -381,7 +380,7 @@ public class DriveSubsystem extends SubsystemBase {
     boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
     if (!tv) return new ChassisSpeeds(0, 0, 0);
 
-    double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName); System.out.println(botpose);
+    double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName);
     if (botpose == null || botpose.length < 2) {
       return new ChassisSpeeds(0, 0, 0);
     }
@@ -400,16 +399,17 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     double robotStrafeSetpoint = coralTargetX - MECHANISM_X_OFFSET;
+    robotStrafeSetpoint = coralTargetX;
     alignPID_STRAFE.setSetpoint(robotStrafeSetpoint);
 
     double xSpeed = -alignPID_STRAFE.calculate(xMeters);
     xSpeed = MathUtil.clamp(xSpeed, -AutoAlignConstants.MAX_SPEED, AutoAlignConstants.MAX_SPEED);
 
     double ySpeed = -alignPID_FOWARD.calculate(-yMeters);
-    ySpeed = MathUtil.clamp(xSpeed, -AutoAlignConstants.MAX_SPEED, AutoAlignConstants.MAX_SPEED);
+    ySpeed = MathUtil.clamp(ySpeed, -AutoAlignConstants.MAX_SPEED, AutoAlignConstants.MAX_SPEED);
     
     double rotationSpeed = alignPID_ROTATION.calculate(currentYaw);
-    rotationSpeed = MathUtil.clamp(xSpeed, -AutoAlignConstants.MAX_ROTATION_SPEED, AutoAlignConstants.MAX_ROTATION_SPEED);
+    rotationSpeed = MathUtil.clamp(rotationSpeed, -AutoAlignConstants.MAX_ROTATION_SPEED, AutoAlignConstants.MAX_ROTATION_SPEED);
 
     if (alignPID_STRAFE.atSetpoint()) xSpeed = 0;
     if (alignPID_FOWARD.atSetpoint()) ySpeed = 0;
@@ -419,7 +419,7 @@ public class DriveSubsystem extends SubsystemBase {
     if (Math.abs(yMeters - alignPID_FOWARD.getSetpoint()) < 0.02) ySpeed = 0;
     if (Math.abs(currentYaw) < 1.0) rotationSpeed = 0;
 
-    return new ChassisSpeeds(ySpeed, xSpeed, rotationSpeed);  
+    return new ChassisSpeeds(ySpeed, xSpeed, rotationSpeed);  // ySpeed, xSpeed, rotationSpeed
   }
 
   // Drive Subsystem Constructor and Periodic

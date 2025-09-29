@@ -5,13 +5,25 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "sourceCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ejectCoral"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Middle to I"
+                  "pathName": "New Path"
                 }
               },
               {
@@ -26,13 +38,25 @@
         {
           "type": "named",
           "data": {
-            "name": "ejectCoral"
+            "name": "AlignRightCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForwardCommand"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
           }
         },
         {
@@ -42,7 +66,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "I to Source"
+                  "pathName": "New New Path"
                 }
               },
               {
@@ -57,13 +81,7 @@
         {
           "type": "named",
           "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "name": "ejectCoral"
           }
         },
         {
@@ -73,7 +91,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Source to J"
+                  "pathName": "New Path"
                 }
               },
               {
@@ -88,25 +106,31 @@
         {
           "type": "named",
           "data": {
-            "name": "ejectCoral"
+            "name": "AlignLeftCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForwardCommand"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.5
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Copy of E to Teleop"
+            "name": "intakeCoral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "New Folder",
+  "folder": null,
   "choreoAuto": false
 }

@@ -26,17 +26,23 @@ package frc.robot.subsystems;
 import java.util.Map;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -45,10 +51,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   private SparkMax m_secondaryMotor;
 
   private AbsoluteEncoder m_primaryEncoder;
+  private RelativeEncoder encoder;
   private int m_counter;  
 
   public static final SparkMaxConfig primaryMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
+  public SparkClosedLoopController pid;
+  public PIDController controller = new PIDController(0.02, 0, 0);
 
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
@@ -71,20 +80,38 @@ public class ElevatorSubsystem extends SubsystemBase {
     m_secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     m_primaryEncoder = m_primaryMotor.getAbsoluteEncoder();
+    encoder = m_primaryMotor.getEncoder();
+    encoder.setPosition(0);
   }
 
   public void setElevatorPosition(double position) {
     System.out.println("Moving elevator position to " + position +  " | Relative Encoder position " + m_primaryEncoder.getPosition());
-    m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
+    if (OIConstants.kDebug) {
+      //m_primaryMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0.0), ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.1, ArbFFUnits.kPercentOut);
+      double output = controller.calculate(encoder.getPosition(), position);
+      m_primaryMotor.set(output);
+    } else {
+      m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
+    }
+  }
+  private GenericEntry basura = ShuffleboardConstants.kElevatorTab.add("Setpoint", 0).getEntry();
+  {
+    ShuffleboardConstants.kElevatorTab.add("pid", controller);
+  }
+  public void mierda() {
+    double output = controller.calculate(m_primaryEncoder.getPosition(), basura.getDouble(0.0));
+    m_primaryMotor.set(output);
   }
 
-  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kDebugTab.add("Elevator PID", 0)
-  .withWidget(BuiltInWidgets.kNumberSlider)
+  private GenericEntry shuffleBoardPos = ShuffleboardConstants.kElevatorTab.add("Elevator PID", 0)
   .withSize(2, 1)
   .withPosition(0, 2)
-  .withProperties(Map.of("min_value", -55, "max_value", 0))
+  //.withProperties(Map.of("min_value", -50, "max_value", 50))
   .getEntry();
+  {
+    
 
+  }
   public void setShuffleboardPIDElevator() {
     m_primaryMotor.getClosedLoopController().setReference(shuffleBoardPos.getDouble(0), ControlType.kPosition);
   }
@@ -126,20 +153,24 @@ public class ElevatorSubsystem extends SubsystemBase {
   public double getElevatorHeight() {
     return getEncoderPosition() + 360 * Math.floor(getEncoderPosition() / 360);
   }
-
+  /*
   private GenericEntry elevatorPosition = ShuffleboardConstants.kElevatorTab.add("Elevator Position", 0.0).getEntry();
   private GenericEntry elevatorVelocity = ShuffleboardConstants.kElevatorTab.add("Elevator Velocity", 0.0).getEntry();
   private GenericEntry elevatorHeight = ShuffleboardConstants.kElevatorTab.add("Elevator Height", 0.0).getEntry();
   private GenericEntry primaryMotorCurrent = ShuffleboardConstants.kElevatorTab.add("Primary Motor Current", 0.0).getEntry();
   private GenericEntry secondaryMotorCurrent = ShuffleboardConstants.kElevatorTab.add("Secondary Motor Current", 0.0).getEntry();
-
+ */
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    /* 
     elevatorPosition.setDouble(getEncoderPosition());
     elevatorVelocity.setDouble(getEncoderVelocity());
     elevatorHeight.setDouble(getElevatorHeight());
     primaryMotorCurrent.setDouble(m_primaryMotor.getOutputCurrent());
     secondaryMotorCurrent.setDouble(m_secondaryMotor.getOutputCurrent());
+    */
+    //System.out.printf("Elevator Position: %.2f | Velocity: %.2f | Primary Current: %.2f | Secondary Current: %.2f\n", 
+      //encoder.getPosition(), encoder.getVelocity(), m_primaryMotor.getOutputCurrent(), m_secondaryMotor.getOutputCurrent());
   }
 }

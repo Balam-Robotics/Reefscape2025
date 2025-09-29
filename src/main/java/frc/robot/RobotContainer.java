@@ -29,6 +29,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -87,7 +88,6 @@ public class RobotContainer {
    * @param m_elevatorSubsystem Subsistema del elevador
    * @param m_coralSubsystem Subsistema del manipulador del Coral
    * @param m_climberSubsystem Subsistema del climber 
-   * 
    * @param m_cameraSystem Subsistema del sistema de camara del robot
    * 
    */
@@ -96,9 +96,7 @@ public class RobotContainer {
   private ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
-
-  @SuppressWarnings("unused")
-  //private CameraSystem m_cameraSystem = new CameraSystem();
+  private CameraSystem m_cameraSystem = new CameraSystem();
 
   /**
    * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
@@ -134,9 +132,11 @@ public class RobotContainer {
     .withSize(3,1)
     .withPosition(8, 0);
 
-    tejuino_board.init(0); // Inicializar controlador LED
-    tejuino_board.all_leds_red(0); // Prender LEDs en rojo al iniciar el robot
-    tejuino_board.all_leds_blue(tejuino_board.LED_STRIP_1);
+    if (OIConstants.kLEDController) {
+      tejuino_board.init(0); // Inicializar controlador LED
+      tejuino_board.all_leds_red(0); // Prender LEDs en rojo al iniciar el robot
+      tejuino_board.all_leds_blue(tejuino_board.LED_STRIP_1);
+    }
 
     /**
      * 
@@ -245,9 +245,9 @@ public class RobotContainer {
     m_driverController.povLeft().whileTrue(leftAutoAlightCommand);
     m_driverController.povRight().whileTrue(rightAutoAlightCommand);
 
-    //m_driverController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @DRIVER
     m_driverController.povUp().whileTrue(moveForwardCommand);
-    m_driverController.povDown().whileTrue(climbDownCommand); // Move the climber down with the Cross Down @DRIVER
+    m_operatorController.povDown().whileTrue(climbDownCommand); // Move the climber down with the Cross Down @DRIVER
+    m_operatorController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @DRIVER
     //m_driverController.povLeft().whileTrue(climbHoldCommand); @deprecrated
 
     // --- Operator Controller Bindings --- //
@@ -275,11 +275,6 @@ public class RobotContainer {
      * 
      */
 
-    if (OIConstants.kDebug) {
-      m_operatorController.povUp().whileTrue(pidLiftCommand);
-      m_operatorController.povDown().whileTrue(pidWristCommand);
-    }
-
   } 
 
   /**
@@ -295,9 +290,12 @@ public class RobotContainer {
     NamedCommands.registerCommand("l2Command", l2CommandGroup);
     NamedCommands.registerCommand("l3Command", l3CommandGroup);
     NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);
-    NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(3));
-    NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(1 ));
+    NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(0.5));
+    NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(2));
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
+    NamedCommands.registerCommand("AlignLeftCoral", leftAutoAlightCommand.withTimeout(2));
+    NamedCommands.registerCommand("AlignRightCoral", rightAutoAlightCommand.withTimeout(2));
+    NamedCommands.registerCommand("ForwardCommand", moveForwardCommand.withTimeout(0.001));
     
   }
 
@@ -307,7 +305,7 @@ public class RobotContainer {
    * 
    */
 
-   PowerDistribution pdh = new PowerDistribution(1, PowerDistribution.ModuleType.kRev); // DEFAULT 63, PUT 1 OTHERWISE THE SIMULATOR FUCKIGN CRASHES
+  private PowerDistribution REV_PDH;
 
   private void setupElastic() {
 
@@ -337,11 +335,18 @@ public class RobotContainer {
     .withSize(2, 3)
     .withPosition(4, 0);;
     
-    ShuffleboardConstants.kDebugTab.add("Power Distribution Hub", pdh)
+    if (RobotBase.isSimulation()) {
+      REV_PDH  = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+    } else {
+      REV_PDH  = new PowerDistribution(63, PowerDistribution.ModuleType.kRev);
+      m_cameraSystem.init();
+    }
+    
+    ShuffleboardConstants.kDebugTab.add("Power Distribution Hub", REV_PDH)
     .withWidget(BuiltInWidgets.kPowerDistribution)
     .withSize(3, 4)
     .withPosition(6, 0);
-
+ 
   }
 
   /**
@@ -355,13 +360,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     if (OIConstants.kDemo) { 
-      SequentialCommandGroup prueba = new SequentialCommandGroup(liftToSourceCommand, new WaitCommand(1.5), liftToL1Command, new WaitCommand(1.5));
-      SequentialCommandGroup yes = new SequentialCommandGroup(prueba, prueba, prueba);
-
-      return yes;
+      return centerAutoAlignCommand;
     }
 
-    return centerAutoAlignCommand;
-    //return autoChooser.getSelected();
+    return autoChooser.getSelected();
   }
 }
