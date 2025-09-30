@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.8181078767123287,
-        "y": 5.1293878424657535
+        "x": 1.6645559210526315,
+        "y": 4.871710526315789
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2538527397260273,
-        "y": 6.902418664383561
+        "x": 2.10030078406633,
+        "y": 6.644741348233597
       },
       "isLocked": false,
       "linkedName": "balam_recibir"
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 0.5,
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

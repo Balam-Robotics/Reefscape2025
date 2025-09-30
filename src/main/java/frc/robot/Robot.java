@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
     ledChooser.addOption("Rainbow", () -> LED_CONTROL.rainbow_effect(LED_CONTROL.LED_STRIP_1));
     ShuffleboardConstants.kDriverTab.add("LED Mode", ledChooser)
     .withSize(3,1)
-    .withPosition(8, 1);
+    .withPosition(8, 0);
   }
 
   @Override
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    Elastic.selectTab("Driver");
+    Elastic.selectTab("Autonomous");
     ElasticNotification.sendNotification(notification, "Autonomous Init", "Autonomous mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
     if (OIConstants.kLEDController) {
       LED_CONTROL.all_leds_white(LED_CONTROL.LED_STRIP_1);
@@ -104,13 +104,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    if (OIConstants.kDebug) {
-      Elastic.selectTab("Debug");
-      ElasticNotification.sendNotification(notification, "Teleop Init (DEBUG)", "Teleoperated  DEBUG mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
-    } else {
-      Elastic.selectTab("Driver");
-      ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
-    }
+    Elastic.selectTab("Teleoperated");
+    ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
 
     if (OIConstants.kLEDController) {
       var alliance = DriverStation.getAlliance();

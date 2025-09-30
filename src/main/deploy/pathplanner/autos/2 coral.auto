@@ -13,26 +13,19 @@
         {
           "type": "named",
           "data": {
-            "name": "ejectCoral"
+            "name": "intakeCoral"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "New Path"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "l2Command"
-                }
-              }
-            ]
+            "name": "resetCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New Path"
           }
         },
         {
@@ -44,13 +37,37 @@
         {
           "type": "named",
           "data": {
+            "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "ForwardCommand"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "resetCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "return trip"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "sourceCommand"
           }
         },
         {
@@ -60,47 +77,15 @@
           }
         },
         {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "New New Path"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "sourceCommand"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "ejectCoral"
+            "name": "resetCommand"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "New Path"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "l2Command"
-                }
-              }
-            ]
+            "pathName": "New Path"
           }
         },
         {
@@ -112,19 +97,25 @@
         {
           "type": "named",
           "data": {
+            "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "ForwardCommand"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 1.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "intakeCoral"
+            "name": "resetCommand"
           }
         }
       ]

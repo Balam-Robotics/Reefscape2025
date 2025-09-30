@@ -34,7 +34,9 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -42,6 +44,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,6 +57,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -161,22 +165,24 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
   private ShuffleboardLayout gyroLayout = ShuffleboardConstants.kDriverTab
-  .getLayout("Gyro Data", BuiltInLayouts.kList)
-  .withSize(2, 5)
-  .withPosition(6, 0);
+      .getLayout("Gyro Data", BuiltInLayouts.kList)
+      .withSize(2, 5)
+      .withPosition(6, 0);
 
   private boolean m_isFieldOriented = true;
   /*
-  {
-    ShuffleboardConstants.kDriverTab.add("Field Oriented", m_isFieldOriented)
-    .withWidget(BuiltInWidgets.kToggleButton)
-    .withSize(2, 1)
-    .withPosition(0, 0);
-    ShuffleboardConstants.kDriverTab.add("Field Oriented Boolean", m_isFieldOriented)
-    .withWidget(BuiltInWidgets.kBooleanBox)
-    .withSize(1, 01)
-    .withPosition(0, 1);
-  } */
+   * {
+   * ShuffleboardConstants.kDriverTab.add("Field Oriented", m_isFieldOriented)
+   * .withWidget(BuiltInWidgets.kToggleButton)
+   * .withSize(2, 1)
+   * .withPosition(0, 0);
+   * ShuffleboardConstants.kDriverTab.add("Field Oriented Boolean",
+   * m_isFieldOriented)
+   * .withWidget(BuiltInWidgets.kBooleanBox)
+   * .withSize(1, 01)
+   * .withPosition(0, 1);
+   * }
+   */
 
   public void changeDriveMode() {
     m_isFieldOriented = !m_isFieldOriented;
@@ -348,9 +354,8 @@ public class DriveSubsystem extends SubsystemBase {
     };
   }
 
-
   // -- Auto Align with PID Controller -- //
-  
+
   PIDController alignPID_STRAFE = new PIDController(2.5, 0.05, 0.001);
   PIDController alignPID_FOWARD = new PIDController(2, 0, 0.1);
   PIDController alignPID_ROTATION = new PIDController(0.1, 0, 0);
@@ -360,26 +365,25 @@ public class DriveSubsystem extends SubsystemBase {
   final double MECHANISM_X_OFFSET = 0.25; // meters
 
   {
-  LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
-  .withWidget(BuiltInWidgets.kNumberSlider)
-  .withSize(2, 1)
-  .withPosition(0, 0)
-  .withProperties(Map.of("min_value", -50, "max_value", 50))
-  .getEntry();
+    LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
+        .withSize(2, 1)
+        .withPosition(0, 0)
+        .withProperties(Map.of("min_value", -50, "max_value", 50))
+        .getEntry();
 
-  RIGHT_OFFSET = ShuffleboardConstants.kDebugTab.add("Right Coral Offset", RIGHT_CORAL_OFFSET)
-  .withWidget(BuiltInWidgets.kNumberSlider)
-  .withSize(2, 1)
-  .withPosition(0, 1)
-  .withProperties(Map.of("min_value", -50, "max_value", 50))
-  .getEntry();
- }
+    RIGHT_OFFSET = ShuffleboardConstants.kDebugTab.add("Right Coral Offset", RIGHT_CORAL_OFFSET)
+        .withSize(2, 1)
+        .withPosition(0, 1)
+        .withProperties(Map.of("min_value", -50, "max_value", 50))
+        .getEntry();
+  }
 
   public ChassisSpeeds alignWithPID(Constants.Direction direction) {
 
     boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
-    if (!tv) return new ChassisSpeeds(0, 0, 0);
-
+    if (!tv)
+      return new ChassisSpeeds(0, 0, 0);
+    System.out.println("wat");
     double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName);
     if (botpose == null || botpose.length < 2) {
       return new ChassisSpeeds(0, 0, 0);
@@ -388,13 +392,14 @@ public class DriveSubsystem extends SubsystemBase {
     double xMeters = botpose[0];
     double yMeters = botpose[2];
     double currentYaw = botpose[4];
-    
+    System.out.printf("X: %s.2f, Y: %s.2f, Z: %s", xMeters, yMeters, currentYaw);
+
     double coralTargetX = 0.0;
     if (direction == Constants.Direction.RIGHT) {
       coralTargetX = OIConstants.kDebug ? RIGHT_OFFSET.getDouble(0.0) : RIGHT_CORAL_OFFSET;
     } else if (direction == Constants.Direction.LEFT) {
       coralTargetX = OIConstants.kDebug ? LEFT_OFFSET.getDouble(0.0) : LEFT_CORAL_OFFSET;
-    }  else if (direction == Constants.Direction.CENTER) {
+    } else if (direction == Constants.Direction.CENTER) {
       coralTargetX = 0.0;
     }
 
@@ -407,19 +412,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     double ySpeed = -alignPID_FOWARD.calculate(-yMeters);
     ySpeed = MathUtil.clamp(ySpeed, -AutoAlignConstants.MAX_SPEED, AutoAlignConstants.MAX_SPEED);
-    
-    double rotationSpeed = alignPID_ROTATION.calculate(currentYaw);
-    rotationSpeed = MathUtil.clamp(rotationSpeed, -AutoAlignConstants.MAX_ROTATION_SPEED, AutoAlignConstants.MAX_ROTATION_SPEED);
 
-    if (alignPID_STRAFE.atSetpoint()) xSpeed = 0;
-    if (alignPID_FOWARD.atSetpoint()) ySpeed = 0;
-    if (alignPID_ROTATION.atSetpoint()) rotationSpeed = 0;
+    double rotationSpeed = -alignPID_ROTATION.calculate(currentYaw);
+    rotationSpeed = MathUtil.clamp(rotationSpeed, -AutoAlignConstants.MAX_ROTATION_SPEED,
+        AutoAlignConstants.MAX_ROTATION_SPEED);
 
-    if (Math.abs(xMeters) < 0.01) xSpeed = 0;
-    if (Math.abs(yMeters - alignPID_FOWARD.getSetpoint()) < 0.02) ySpeed = 0;
-    if (Math.abs(currentYaw) < 1.0) rotationSpeed = 0;
+    if (alignPID_STRAFE.atSetpoint())
+      xSpeed = 0;
+    if (alignPID_FOWARD.atSetpoint())
+      ySpeed = 0;
+    if (alignPID_ROTATION.atSetpoint())
+      rotationSpeed = 0;
 
-    return new ChassisSpeeds(ySpeed, xSpeed, rotationSpeed);  // ySpeed, xSpeed, rotationSpeed
+    if (Math.abs(xMeters) < 0.01)
+      xSpeed = 0;
+    if (Math.abs(yMeters - alignPID_FOWARD.getSetpoint()) < 0.02)
+      ySpeed = 0;
+    if (Math.abs(currentYaw) < 1.0)
+      rotationSpeed = 0;
+
+    return new ChassisSpeeds(ySpeed, xSpeed, rotationSpeed); // ySpeed, xSpeed, rotationSpeed
   }
 
   // Drive Subsystem Constructor and Periodic
@@ -434,95 +446,47 @@ public class DriveSubsystem extends SubsystemBase {
 
     alignPID_FOWARD.reset();
     alignPID_FOWARD.setTolerance(0.02);
-    alignPID_FOWARD.setSetpoint(0.7);
+    alignPID_FOWARD.setSetpoint(1.3);
 
     alignPID_ROTATION.reset();
     alignPID_ROTATION.setTolerance(1.0);
     alignPID_ROTATION.setSetpoint(0.0);
 
     ShuffleboardConstants.kTestTab.add("Align Strafe PID", alignPID_STRAFE)
-    .withWidget(BuiltInWidgets.kPIDController)
-    .withSize(2, 3)
-    .withPosition(0, 0);
+        .withWidget(BuiltInWidgets.kPIDController)
+        .withSize(2, 3)
+        .withPosition(0, 0);
     ShuffleboardConstants.kTestTab.add("Align Forward PID", alignPID_FOWARD)
-    .withWidget(BuiltInWidgets.kPIDController)
-    .withSize(2, 3)
-    .withPosition(2, 0);
+        .withWidget(BuiltInWidgets.kPIDController)
+        .withSize(2, 3)
+        .withPosition(2, 0);
     ShuffleboardConstants.kTestTab.add("Align Rotation PID", alignPID_ROTATION)
-    .withWidget(BuiltInWidgets.kPIDController)
-    .withSize(2, 3)
-    .withPosition(4, 0);
+        .withWidget(BuiltInWidgets.kPIDController)
+        .withSize(2, 3)
+        .withPosition(4, 0);
 
     // Elastic Test
-      ShuffleboardConstants.kDriverTab.add("Swerve State", builder -> {
-        builder.setSmartDashboardType("SwerveDrive");
-
-        builder.addDoubleProperty(
-            "Front Left Angle", () -> m_frontLeft.getState().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Front Left Velocity", () -> m_frontLeft.getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Front Right Angle", () -> m_frontRight.getState().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Front Right Velocity", () -> m_frontRight.getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Back Left Angle", () -> m_backLeft.getState().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Back Left Velocity", () -> m_backLeft.getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Back Right Angle", () -> m_backRight.getState().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Back Right Velocity", () -> m_backRight.getState().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Robot Angle", () -> getHeading().getRadians(), null);
-      }).withSize(2, 2).withPosition(4, 0);
-
-      ShuffleboardConstants.kDriverTab.add("Swerve Visualizer", builder -> {
-        builder.setSmartDashboardType("SwerveDrive");
-
-        builder.addDoubleProperty(
-            "Front Left Angle", () -> m_frontLeft.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Front Left Velocity", () -> m_frontLeft.getSetpoints().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Front Right Angle", () -> m_frontRight.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Front Right Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Back Left Angle", () -> m_backLeft.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Back Left Velocity", () -> m_backLeft.getSetpoints().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Back Right Angle", () -> m_backRight.getSetpoints().angle.getRadians(), null);
-        builder.addDoubleProperty(
-            "Back Right Velocity", () -> m_backRight.getSetpoints().speedMetersPerSecond, null);
-
-        builder.addDoubleProperty(
-            "Robot Angle", () -> getHeading().getRadians(), null);
-      }).withSize(2, 2).withPosition(4, 2);
+    create_swerve_display(ShuffleboardConstants.kDriverTab, true);
+    create_swerve_display(ShuffleboardConstants.kAutonomousTab, true);
 
     // Shuffleboard Gyro
     gyroLayout.addBoolean("Gyro Connected", () -> m_gyro.isConnected());
     gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox)
-    //.withProperties(Map.of("Color when true", "4CAF50", "Color when false", "#ffcc00"));
-    .withProperties(Map.of("false_color", "0xffffcc00"));
-    gyroLayout.addBoolean("Field Oriented", () ->  m_isFieldOriented);
-    gyroLayout.addDouble("Gyro Angle", () ->  m_gyro.getAngle()).withWidget(BuiltInWidgets.kGyro);
-    
+        // .withProperties(Map.of("Color when true", "4CAF50", "Color when false",
+        // "#ffcc00"));
+        .withProperties(Map.of("false_color", "0xffffcc00"));
+    gyroLayout.addBoolean("Field Oriented", () -> m_isFieldOriented);
+    gyroLayout.addDouble("Gyro Angle", () -> m_gyro.getAngle()).withWidget(BuiltInWidgets.kGyro);
 
     // Shuffleboard 2D Field
 
     field = new Field2d();
     ShuffleboardConstants.kDriverTab.add("Field", field)
-    .withSize(3,2)
-    .withPosition(8, 3);;
+        .withSize(3, 2)
+        .withPosition(8, 3);
+    ShuffleboardConstants.kAutonomousTab.add("Autonomous Field", field)
+        .withSize(4, 3)
+        .withPosition(6, 1);
 
     // Pathplanner trajectory for AdvantageScope
 
@@ -568,15 +532,83 @@ public class DriveSubsystem extends SubsystemBase {
 
   }
 
+  public void create_swerve_display(ShuffleboardTab tab, boolean real) {
+    tab.add("Swerve State", builder -> {
+      builder.setSmartDashboardType("SwerveDrive");
+
+      builder.addDoubleProperty(
+          "Front Left Angle", () -> m_frontLeft.getState().angle.getRadians(), null);
+      builder.addDoubleProperty(
+          "Front Left Velocity", () -> m_frontLeft.getState().speedMetersPerSecond, null);
+
+      builder.addDoubleProperty(
+          "Front Right Angle", () -> m_frontRight.getState().angle.getRadians(), null);
+      builder.addDoubleProperty(
+          "Front Right Velocity", () -> m_frontRight.getState().speedMetersPerSecond, null);
+
+      builder.addDoubleProperty(
+          "Back Left Angle", () -> m_backLeft.getState().angle.getRadians(), null);
+      builder.addDoubleProperty(
+          "Back Left Velocity", () -> m_backLeft.getState().speedMetersPerSecond, null);
+
+      builder.addDoubleProperty(
+          "Back Right Angle", () -> m_backRight.getState().angle.getRadians(), null);
+      builder.addDoubleProperty(
+          "Back Right Velocity", () -> m_backRight.getState().speedMetersPerSecond, null);
+
+      builder.addDoubleProperty(
+          "Robot Angle", () -> getHeading().getRadians(), null);
+    }).withSize(2, 2).withPosition(4, 0)
+        .withProperties(Map.of("show_robot_rotation", true, "rotation_unit", "radians"));
+
+    if (!real) {
+      tab.add("Swerve Visualizer", builder -> {
+        builder.setSmartDashboardType("SwerveDrive");
+
+        builder.addDoubleProperty(
+            "Front Left Angle", () -> m_frontLeft.getSetpoints().angle.getRadians(), null);
+        builder.addDoubleProperty(
+            "Front Left Velocity", () -> m_frontLeft.getSetpoints().speedMetersPerSecond, null);
+
+        builder.addDoubleProperty(
+            "Front Right Angle", () -> m_frontRight.getSetpoints().angle.getRadians(), null);
+        builder.addDoubleProperty(
+            "Front Right Velocity", () -> m_frontRight.getSetpoints().speedMetersPerSecond, null);
+
+        builder.addDoubleProperty(
+            "Back Left Angle", () -> m_backLeft.getSetpoints().angle.getRadians(), null);
+        builder.addDoubleProperty(
+            "Back Left Velocity", () -> m_backLeft.getSetpoints().speedMetersPerSecond, null);
+
+        builder.addDoubleProperty(
+            "Back Right Angle", () -> m_backRight.getSetpoints().angle.getRadians(), null);
+        builder.addDoubleProperty(
+            "Back Right Velocity", () -> m_backRight.getSetpoints().speedMetersPerSecond, null);
+
+        builder.addDoubleProperty(
+            "Robot Angle", () -> getHeading().getRadians(), null);
+      }).withSize(2, 2).withPosition(4, 2);
+    }
+  }
+
+  private void updateVisionOdometry() {
+    LimelightHelpers.PoseEstimate limelightMeasurments = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
+    if (limelightMeasurments.tagCount >= 2) {
+      poseEstimator.addVisionMeasurement(limelightMeasurments.pose, limelightMeasurments.timestampSeconds, VecBuilder.fill(0.7, 0.2, 999999));
+    }
+  }
+
   @Override
   public void periodic() {
     // Odometry Update
 
     m_odometry.update(getHeading(), getSwerveModulePositions());
 
-    poseEstimator.update(getRotation2d(), getSwerveModulePositions());
+    updateVisionOdometry();
+    // poseEstimator.update(getRotation2d(), getSwerveModulePositions());
 
     field.setRobotPose(m_odometry.getPoseMeters());
+    field.getObject("Pose Estimator").setPose(poseEstimator.getEstimatedPosition());
 
     // Publish Advantage Scope Data and Shuffleboard Data
 
