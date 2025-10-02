@@ -124,7 +124,7 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final boolean kDebug = true;
-    public static final boolean kDemo = true;
+    public static final boolean kDemo = false;
     public static final boolean kOneDriver = false;
     public static final boolean kLEDController = false;
 
@@ -172,7 +172,7 @@ public final class Constants {
     public static final double kMaxModuleSpeed = 4.8; // Max speed for each module
     public static final double kDriveBaseRadius = 0.46; // Distance from robot center to one module
 
-    public static final double kForwardSpeed = 0.5;
+    public static final double kForwardSpeed = 1;
 
   }
 
@@ -201,6 +201,7 @@ public final class Constants {
     public static final ShuffleboardTab kCoralTab = Shuffleboard.getTab("Coral");
     public static final ShuffleboardTab kElevatorTab = Shuffleboard.getTab("Elevator");
     public static final ShuffleboardTab kClimberTab = Shuffleboard.getTab("Climber");
+    public static final ShuffleboardTab kAlgaeTab = Shuffleboard.getTab("Algae");
     public static final ShuffleboardTab kDebugTab = Shuffleboard.getTab("Debug");
     public static final ShuffleboardTab kTestTab = Shuffleboard.getTab("Align PID Tuning");
   }
@@ -233,7 +234,7 @@ public final class Constants {
    * @author BALAM 3527
    */
 
-  public static final class CoralIntakeConstants {
+  public static final class CoralConstants {
     public static final int kWristMotorId = 41;
     public static final int kIntakeMotorId = 42;
 
@@ -249,6 +250,34 @@ public final class Constants {
     public static final double kWristPIDkP = 0.05;
     public static final double kWristPIDkI = 0;
     public static final double kWristPIDkD = 0;
+  }
+
+  /*
+   * Clase que maneja todas las constantes del sistema de algae
+   * Configuracion del sistema de algae
+   * 
+   * @author BALAM 3527
+   */
+
+  public static final class AlgaeConstants {
+    public static final int kPrimaryMotorId = 5;
+    public static final int kSecondaryMotorId = 6;
+    public static final int kWristMotorId = 7;
+
+    public static final int kPrimaryCurrentLimit = 15;
+    public static final int kSecondaryCurrentLimit = 15;
+    public static final int kWristCurrentLimit = 40;
+
+    public static final IdleMode kPrimaryIdleMode = IdleMode.kCoast;
+    public static final IdleMode kSecondaryIdleMode = IdleMode.kCoast;
+    public static final IdleMode kWristIdleMode = IdleMode.kBrake;
+
+    public static final double kWristMaxPosition = 0.0;
+    public static final double kWristMinPosition = 0.0;
+
+    public static final double kWristPIDkP = 0.05;
+    public static final double kWristPIDkI = 0.0;
+    public static final double kWristPIDkD = 0.0;
   }
 
   /**
@@ -294,11 +323,11 @@ public final class Constants {
   }
 
   public static final class AutoAlignConstants {
-    public static final double RIGHT_CORAL_OFFSET = 0.35;
-    public static final double LEFT_CORAL_OFFSET = 0;
+    public static final double RIGHT_CORAL_OFFSET = 0.20;
+    public static final double LEFT_CORAL_OFFSET = -0.17;
 
     public static final double MAX_SPEED = 1;
-    public static final double MAX_ROTATION_SPEED = 0.5;
+    public static final double MAX_ROTATION_SPEED = 1;
   }
 
   /**

@@ -25,19 +25,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignRightCoral"
+            "pathName": "go trip"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignRightCoral"
           }
         },
         {
@@ -85,19 +85,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignLeftCoral"
+            "pathName": "go trip"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeftCoral"
           }
         },
         {

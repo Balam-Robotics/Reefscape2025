@@ -51,7 +51,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
-    //System.out.println("Creates a new ElevatorSubsystem");
     m_primaryMotor = new SparkMax(ElevatorConstants.kPrimaryElevatorMotorId, MotorType.kBrushless);
     m_secondaryMotor = new SparkMax(ElevatorConstants.kSecondaryElevatorMotorId, MotorType.kBrushless);
 
@@ -74,7 +73,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void setElevatorPosition(double position) {
-    System.out.println("Moving elevator position to " + position +  " | Relative Encoder position " + m_primaryEncoder.getPosition());
     m_primaryMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
   public void setDEBUGElevatorPosition() {
@@ -84,7 +82,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private GenericEntry elevatorPIDEntry = ShuffleboardConstants.kElevatorTab.add("Elevator PID", 0)
   .withSize(2, 1)
   .withPosition(2, 1)
-  .withProperties(Map.of("min_value", 0, "max_value", 50))
+  .withProperties(Map.of("min_value", 0, "max_value", 50, "show_submit_button", true))
   .getEntry();
 
   public void setElevatorSpeed(double speed) {

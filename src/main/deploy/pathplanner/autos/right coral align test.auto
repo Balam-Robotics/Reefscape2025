@@ -7,19 +7,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New New New Path"
+            "pathName": "Backwards Path"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "AlignRightCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "l2Command"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AlignRightCoral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "l2Command"
+                }
+              }
+            ]
           }
         },
         {

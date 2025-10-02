@@ -45,6 +45,29 @@ public class Robot extends TimedRobot {
     if (OIConstants.kLEDController) {
       confiureChoosers();
     }
+    if (OIConstants.kDebug) Elastic.sendNotification(notification
+    .withLevel(Elastic.NotificationLevel.WARNING)
+    .withTitle("DEBUG MODE ON")
+    .withDescription("MODO DEBUG ACTIVADO - NO COMPETENCIA")
+    .withDisplaySeconds(10)
+    );
+    if (OIConstants.kDemo) Elastic.sendNotification(notification
+    .withLevel(Elastic.NotificationLevel.WARNING)
+    .withTitle("DEMO MODE ON")
+    .withDescription("MODO DEMO ACTIVADO - NO COMPETENCIA")
+    .withDisplaySeconds(10)
+    );
+  }
+
+  private void autoLED() {
+    if (OIConstants.kLEDController) {
+      var alliance = DriverStation.getAlliance();
+      if (alliance.get() == DriverStation.Alliance.Red) {
+        LED_CONTROL.all_leds_red(LED_CONTROL.LED_STRIP_1);
+      } else if (alliance.get() == DriverStation.Alliance.Blue) {
+        LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1);
+      }
+    }
   }
 
   public void confiureChoosers() {
@@ -53,6 +76,7 @@ public class Robot extends TimedRobot {
     ledChooser.addOption("Blue", () -> LED_CONTROL.all_leds_blue(LED_CONTROL.LED_STRIP_1));
     ledChooser.addOption("Green", () -> LED_CONTROL.all_leds_green(LED_CONTROL.LED_STRIP_1));
     ledChooser.addOption("Rainbow", () -> LED_CONTROL.rainbow_effect(LED_CONTROL.LED_STRIP_1));
+    ledChooser.addOption("Automatic", () -> autoLED());
     ShuffleboardConstants.kDriverTab.add("LED Mode", ledChooser)
     .withSize(3,1)
     .withPosition(8, 0);

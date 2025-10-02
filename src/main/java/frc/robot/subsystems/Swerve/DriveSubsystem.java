@@ -34,13 +34,12 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -368,22 +367,21 @@ public class DriveSubsystem extends SubsystemBase {
     LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
         .withSize(2, 1)
         .withPosition(0, 0)
-        .withProperties(Map.of("min_value", -50, "max_value", 50))
+        .withProperties(Map.of("show_submit_button", true))
         .getEntry();
 
     RIGHT_OFFSET = ShuffleboardConstants.kDebugTab.add("Right Coral Offset", RIGHT_CORAL_OFFSET)
         .withSize(2, 1)
         .withPosition(0, 1)
-        .withProperties(Map.of("min_value", -50, "max_value", 50))
+        .withProperties(Map.of("show_submit_button", true))
         .getEntry();
   }
 
   public ChassisSpeeds alignWithPID(Constants.Direction direction) {
 
     boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
-    if (!tv)
-      return new ChassisSpeeds(0, 0, 0);
-    System.out.println("wat");
+    if (!tv) return new ChassisSpeeds(0, 0, 0);
+    
     double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName);
     if (botpose == null || botpose.length < 2) {
       return new ChassisSpeeds(0, 0, 0);
@@ -471,10 +469,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Shuffleboard Gyro
     gyroLayout.addBoolean("Gyro Connected", () -> m_gyro.isConnected());
-    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox)
+    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("false_color", "4283215696"));
         // .withProperties(Map.of("Color when true", "4CAF50", "Color when false",
         // "#ffcc00"));
-        .withProperties(Map.of("false_color", "0xffffcc00"));
+        //.withProperties(Map.of("false_color", "0xffffcc00"));
     gyroLayout.addBoolean("Field Oriented", () -> m_isFieldOriented);
     gyroLayout.addDouble("Gyro Angle", () -> m_gyro.getAngle()).withWidget(BuiltInWidgets.kGyro);
 
@@ -600,11 +598,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     // Odometry Update
 
     m_odometry.update(getHeading(), getSwerveModulePositions());
 
-    updateVisionOdometry();
+    if (!RobotBase.isSimulation()) {
+      updateVisionOdometry();
+    }
     // poseEstimator.update(getRotation2d(), getSwerveModulePositions());
 
     field.setRobotPose(m_odometry.getPoseMeters());

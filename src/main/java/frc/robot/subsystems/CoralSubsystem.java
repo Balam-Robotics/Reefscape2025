@@ -23,6 +23,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
@@ -36,7 +38,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.CoralConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 
 public class CoralSubsystem extends SubsystemBase {
@@ -56,18 +58,18 @@ public class CoralSubsystem extends SubsystemBase {
   /** Creates a new CoralSubsystem. */
   public CoralSubsystem() {
 
-    m_wristMotor = new SparkMax(CoralIntakeConstants.kWristMotorId, MotorType.kBrushless);
-    m_intakeMotor = new SparkMax(CoralIntakeConstants.kIntakeMotorId, MotorType.kBrushless);
+    m_wristMotor = new SparkMax(CoralConstants.kWristMotorId, MotorType.kBrushless);
+    m_intakeMotor = new SparkMax(CoralConstants.kIntakeMotorId, MotorType.kBrushless);
 
     wristMotorConfig
     
-      .idleMode(CoralIntakeConstants.kWristIdleMode)
-      .smartCurrentLimit(CoralIntakeConstants.kWristCurrentLimit);
+      .idleMode(CoralConstants.kWristIdleMode)
+      .smartCurrentLimit(CoralConstants.kWristCurrentLimit);
     wristMotorConfig.closedLoop
-      .pidf(CoralIntakeConstants.kWristPIDkP, CoralIntakeConstants.kWristPIDkI, CoralIntakeConstants.kWristPIDkD, 0);
+      .pidf(CoralConstants.kWristPIDkP, CoralConstants.kWristPIDkI, CoralConstants.kWristPIDkD, 0);
     intakeMotorConfig
-      .idleMode(CoralIntakeConstants.kIntakeIdleMode)
-      .smartCurrentLimit(CoralIntakeConstants.kIntakeCurrentLimit);
+      .idleMode(CoralConstants.kIntakeIdleMode)
+      .smartCurrentLimit(CoralConstants.kIntakeCurrentLimit);
 
       m_wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       m_intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -90,6 +92,7 @@ public class CoralSubsystem extends SubsystemBase {
   private GenericEntry wristPIDEntry = ShuffleboardConstants.kCoralTab.add("Wrist PID", 0.0)
   .withSize(2,1)
   .withPosition(2, 1)
+  .withProperties(Map.of("show_submit_button", true))
   .getEntry();
   private GenericEntry wristPosition = ShuffleboardConstants.kCoralTab.add("Wrist Angle", 0.0)
   .withWidget(BuiltInWidgets.kGraph)
@@ -126,21 +129,18 @@ public class CoralSubsystem extends SubsystemBase {
   .getEntry();
 
   public void intakeCoral() {
-    System.out.println("Intaking coral");
     isIntakingCoral = true;
     isEjectingCoral = false;
     m_intakeMotor.set(-1);
   }
 
   public void ejectCoral() {
-    System.out.println("Ejecting coral");
     isEjectingCoral = true;
     isIntakingCoral = false;
     m_intakeMotor.set(1);
   }
 
   public void stopCoral() {
-    System.out.println("Stopping coral intake");
     isEjectingCoral = false;
     isIntakingCoral = false;
     m_intakeMotor.set(0);
@@ -161,6 +161,5 @@ public class CoralSubsystem extends SubsystemBase {
     wristVelocity.setDouble(getEncoderVelocity());
     wristVoltage.setDouble(m_wristMotor.getOutputCurrent());
     coralVoltage.setDouble(m_intakeMotor.getOutputCurrent());
-    //System.out.println(shuffleboardPIDController.getSetpoint());
   }
 }
