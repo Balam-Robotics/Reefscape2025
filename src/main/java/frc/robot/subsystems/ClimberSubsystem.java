@@ -24,18 +24,24 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
 
   private SparkMax m_primaryMotor;
   private SparkMax m_secondaryMotor;
+
+  private RelativeEncoder m_encoder;
 
   public static final SparkMaxConfig primaryMotorConfig = new SparkMaxConfig();
   public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
@@ -60,20 +66,52 @@ public class ClimberSubsystem extends SubsystemBase {
       m_primaryMotor.configure(primaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       m_secondaryMotor.configure(secondaryMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    m_encoder = m_primaryMotor.getEncoder();
+
   }
 
   public void setClimberSpeed(double speed) {
-    System.out.println("Setting climber speed to " + speed);
     m_primaryMotor.set(speed);
   }
 
   public void stopClimber() {
-    System.out.println("Stopping climber");
     m_primaryMotor.set(0);
   }
+
+  public double getEncoderPosition() {
+    return m_encoder.getPosition();
+  }
+  public double getEncoderVelocity() {
+    return  m_encoder.getVelocity();
+  }
+
+  private GenericEntry climberPositionEntry = ShuffleboardConstants.kClimberTab.add("Climber Position", 0.0)
+  .withWidget(BuiltInWidgets.kGraph)
+  .withSize(2, 2)
+  .withPosition(0, 0)
+  .getEntry();
+  private GenericEntry climberVelocityEntry = ShuffleboardConstants.kClimberTab.add("Climber Velocity", 0.0)
+  .withWidget(BuiltInWidgets.kAccelerometer)
+  .withSize(2, 1)
+  .withPosition(2, 0)
+  .getEntry();
+  private GenericEntry primaryMotorCurrent = ShuffleboardConstants.kClimberTab.add("Primary Motor Current", 0.0)
+  .withWidget(BuiltInWidgets.kVoltageView)
+  .withSize(2, 1)
+  .withPosition(4, 0)
+  .getEntry();
+  private GenericEntry secondaryMotorCurrent = ShuffleboardConstants.kClimberTab.add("Secondary Motor Current", 0.0)
+  .withWidget(BuiltInWidgets.kVoltageView)
+  .withSize(2, 1)
+  .withPosition(4, 1)
+  .getEntry();
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    climberPositionEntry.setDouble(getEncoderPosition());
+    climberVelocityEntry.setDouble(getEncoderVelocity());
+    primaryMotorCurrent.setDouble(m_primaryMotor.getOutputCurrent());
+    secondaryMotorCurrent.setDouble(m_secondaryMotor.getOutputCurrent());
   }
 }

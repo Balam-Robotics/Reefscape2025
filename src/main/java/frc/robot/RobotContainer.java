@@ -320,7 +320,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
     NamedCommands.registerCommand("AlignLeftCoral", AUTO_leftAutoAlightCommand.withTimeout(2));
     NamedCommands.registerCommand("AlignRightCoral", AUTO_rightAutoAlightCommand.withTimeout(2));
-    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.85).andThen(new WaitCommand(1).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
     
   }
 

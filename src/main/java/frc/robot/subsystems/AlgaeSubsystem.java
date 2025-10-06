@@ -178,6 +178,6 @@ public class AlgaeSubsystem extends SubsystemBase {
     algaeVelocity.setDouble(getEncoderVelocity());
     wristVoltage.setDouble(m_AlgaeWristMotor.getOutputCurrent());
     algaeVoltage.setDouble(m_PrimaryIntakeMotor.getOutputCurrent());
-    System.out.println(Units.radiansToDegrees(getEncoderPosition()));
+    //System.out.println(Units.radiansToDegrees(getEncoderPosition()));
   }
 }
