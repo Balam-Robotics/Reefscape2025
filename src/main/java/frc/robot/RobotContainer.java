@@ -28,6 +28,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -56,6 +57,7 @@ import frc.robot.subsystems.Swerve.DriveSubsystem;
 import frc.robot.util.CameraSystem;
 import frc.robot.util.GameTimer;
 import frc.robot.util.TejuinoBoard;
+import frc.robot.util.VL53L0X;
 
 /**
  * Clase que maneja todas las funciones del robot
@@ -109,6 +111,9 @@ public class RobotContainer {
 
   // Controlador LED
   public final TejuinoBoard tejuino_board = new TejuinoBoard();
+
+  // Time of Flight Sensor
+  private VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.25);;
 
   /**
    * 
@@ -320,7 +325,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
     NamedCommands.registerCommand("AlignLeftCoral", AUTO_leftAutoAlightCommand.withTimeout(2));
     NamedCommands.registerCommand("AlignRightCoral", AUTO_rightAutoAlightCommand.withTimeout(2));
-    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.until(() -> tof.getFilteredDistance() <= 400).withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
     
   }
 
@@ -394,6 +399,10 @@ public class RobotContainer {
     ShuffleboardConstants.kAutonomousTab.add("DEMO Mode", OIConstants.kDemo)
     .withSize(1, 1)
     .withPosition(9, 0);
+
+    ShuffleboardConstants.kDriverTab.addNumber("TOF Distance", () -> tof.getSmoothDistance())
+    .withSize(2, 1)
+    .withPosition(0, 4);
 
   }
 

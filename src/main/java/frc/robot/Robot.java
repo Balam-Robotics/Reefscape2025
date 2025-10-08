@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -24,39 +23,38 @@ public class Robot extends TimedRobot {
   private Elastic.Notification notification = new Elastic.Notification();
   private TejuinoBoard LED_CONTROL;
   private final SendableChooser<Runnable> ledChooser = new SendableChooser<>();
-  
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     DataLogManager.start();
 
-    //CameraServer.startAutomaticCapture(); // Start USB Camera
+    // CameraServer.startAutomaticCapture(); // Start USB Camera
     if (OIConstants.kLEDController) {
       LED_CONTROL = m_robotContainer.tejuino_board; // Start LED Controller
       LED_CONTROL.escuderia_effect(LED_CONTROL.LED_STRIP_0);
     }
 
     Elastic.sendNotification(notification
-    .withLevel(Elastic.NotificationLevel.INFO)
-    .withTitle("Robot Init")
-    .withDescription("Robot initialized successfully.")
-    .withDisplaySeconds(5.0)
-    );
+        .withLevel(Elastic.NotificationLevel.INFO)
+        .withTitle("Robot Init")
+        .withDescription("Robot initialized successfully.")
+        .withDisplaySeconds(5.0));
     if (OIConstants.kLEDController) {
       confiureChoosers();
     }
-    if (OIConstants.kDebug) Elastic.sendNotification(notification
-    .withLevel(Elastic.NotificationLevel.WARNING)
-    .withTitle("DEBUG MODE ON")
-    .withDescription("MODO DEBUG ACTIVADO - NO COMPETENCIA")
-    .withDisplaySeconds(10)
-    );
-    if (OIConstants.kDemo) Elastic.sendNotification(notification
-    .withLevel(Elastic.NotificationLevel.WARNING)
-    .withTitle("DEMO MODE ON")
-    .withDescription("MODO DEMO ACTIVADO - NO COMPETENCIA")
-    .withDisplaySeconds(10)
-    );
+    if (OIConstants.kDebug)
+      Elastic.sendNotification(notification
+          .withLevel(Elastic.NotificationLevel.WARNING)
+          .withTitle("DEBUG MODE ON")
+          .withDescription("MODO DEBUG ACTIVADO - NO COMPETENCIA")
+          .withDisplaySeconds(10));
+    if (OIConstants.kDemo)
+      Elastic.sendNotification(notification
+          .withLevel(Elastic.NotificationLevel.WARNING)
+          .withTitle("DEMO MODE ON")
+          .withDescription("MODO DEMO ACTIVADO - NO COMPETENCIA")
+          .withDisplaySeconds(10));
   }
 
   private void autoLED() {
@@ -78,8 +76,8 @@ public class Robot extends TimedRobot {
     ledChooser.addOption("Rainbow", () -> LED_CONTROL.rainbow_effect(LED_CONTROL.LED_STRIP_1));
     ledChooser.addOption("Automatic", () -> autoLED());
     ShuffleboardConstants.kDriverTab.add("LED Mode", ledChooser)
-    .withSize(3,1)
-    .withPosition(8, 0);
+        .withSize(3, 1)
+        .withPosition(8, 0);
   }
 
   @Override
@@ -88,16 +86,20 @@ public class Robot extends TimedRobot {
     if (OIConstants.kLEDController) {
       ledChooser.getSelected().run();
     }
+
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
@@ -107,14 +109,16 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.schedule();
     }
     Elastic.selectTab("Autonomous");
-    ElasticNotification.sendNotification(notification, "Autonomous Init", "Autonomous mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
+    ElasticNotification.sendNotification(notification, "Autonomous Init", "Autonomous mode initialized.",
+        Elastic.NotificationLevel.WARNING, 5.0);
     if (OIConstants.kLEDController) {
       LED_CONTROL.all_leds_white(LED_CONTROL.LED_STRIP_1);
     }
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void autonomousExit() {
@@ -129,7 +133,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     Elastic.selectTab("Teleoperated");
-    ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.", Elastic.NotificationLevel.WARNING, 5.0);
+    ElasticNotification.sendNotification(notification, "Teleop Init", "Teleoperated mode initialized.",
+        Elastic.NotificationLevel.WARNING, 5.0);
 
     if (OIConstants.kLEDController) {
       var alliance = DriverStation.getAlliance();
@@ -142,10 +147,9 @@ public class Robot extends TimedRobot {
 
   }
 
- @Override
- public void teleopPeriodic() {}
-
-  
+  @Override
+  public void teleopPeriodic() {
+  }
 
   @Override
   public void teleopExit() {
@@ -160,8 +164,10 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 }
