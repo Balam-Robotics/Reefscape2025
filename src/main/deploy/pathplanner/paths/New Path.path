@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.681292808219178,
-        "y": 5.38482448630137
+        "x": 7.1372003424657535,
+        "y": 2.9957405821917806
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7346746575342467,
-        "y": 5.805543664383562
+        "x": 5.860017123287671,
+        "y": 2.09419948630137
       },
       "isLocked": false,
-      "linkedName": "balam_dejar"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.6645559210526315,
-        "y": 4.871710526315789
+        "x": 1.096875,
+        "y": 1.1175299657534241
       },
       "prevControl": {
-        "x": 2.2355319484498914,
-        "y": 5.8183286770007205
+        "x": 2.133647260273973,
+        "y": 1.8387628424657532
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "balam_recibir"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -35,20 +35,20 @@
   "globalConstraints": {
     "maxVelocity": 4.0,
     "maxAcceleration": 4.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularVelocity": 270.0,
+    "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -108.69898280418114
+    "rotation": -127.40535663140857
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -66.57130719125452
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

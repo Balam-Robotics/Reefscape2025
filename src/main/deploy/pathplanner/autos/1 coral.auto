@@ -5,28 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Backwards Path"
+            "name": "l2Command"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AlignRightCoral"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "l2Command"
-                }
-              }
-            ]
+            "name": "AlignLeftCoral"
           }
         },
         {
@@ -39,6 +26,30 @@
           "type": "wait",
           "data": {
             "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "resetCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "a"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "sourceCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
           }
         },
         {

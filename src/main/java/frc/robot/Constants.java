@@ -123,7 +123,7 @@ public final class Constants {
    */
 
   public static final class OIConstants {
-    public static final boolean kDebug = true;
+    public static final boolean kDebug = false;
     public static final boolean kDemo = false;
     public static final boolean kOneDriver = false;
     public static final boolean kLEDController = false;
@@ -266,7 +266,7 @@ public final class Constants {
 
     public static final int kPrimaryCurrentLimit = 15;
     public static final int kSecondaryCurrentLimit = 15;
-    public static final int kWristCurrentLimit = 40;
+    public static final int kWristCurrentLimit = 20;
 
     public static final IdleMode kPrimaryIdleMode = IdleMode.kCoast;
     public static final IdleMode kSecondaryIdleMode = IdleMode.kCoast;
@@ -324,7 +324,7 @@ public final class Constants {
 
   public static final class AutoAlignConstants {
     public static final double RIGHT_CORAL_OFFSET = 0.20;
-    public static final double LEFT_CORAL_OFFSET = -0.17;
+    public static final double LEFT_CORAL_OFFSET = -0.2;
 
     public static final double MAX_SPEED = 1;
     public static final double MAX_ROTATION_SPEED = 1;

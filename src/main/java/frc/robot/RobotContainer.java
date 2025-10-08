@@ -99,7 +99,7 @@ public class RobotContainer {
   private CoralSubsystem m_coralSubsystem = new CoralSubsystem();
   private ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
   private CameraSystem m_cameraSystem = new CameraSystem();
-  private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
+  //private AlgaeSubsystem m_algaeSubsystem = new AlgaeSubsystem();
 
   /**
    * @param autoChoose Variable para seleccionar Autonomo durante modo autonomo 
@@ -214,11 +214,11 @@ public class RobotContainer {
   Command ejectCoralCommand = new StartEndCommand(() -> m_coralSubsystem.ejectCoral(), () -> m_coralSubsystem.stopCoral(), m_coralSubsystem).withName("Eject Coral Command");  
 
   // Algae Intake Commands
-
+  /*
   Command intakeAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.intakeAlgae(), () -> m_algaeSubsystem.stopIntake(), m_algaeSubsystem).withName("Intake Algae Command");
   Command ejectAlgaeCommand = new StartEndCommand(() -> m_algaeSubsystem.ejectAlgae(), () -> m_algaeSubsystem.stopIntake(), m_algaeSubsystem).withName("Eject Algae Command");
   Command algaeWristCommand = Commands.runOnce(() -> m_algaeSubsystem.setWristAngle(0), m_algaeSubsystem).withName("Algae Wrist Command");
-
+ */
   // Auto-Align Commands
 
   Command leftAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.LEFT)), m_robotDrive).withName("Left Coral Auto Align");
@@ -230,16 +230,16 @@ public class RobotContainer {
   Command AUTO_rightAutoAlightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.RIGHT)), m_robotDrive).withName("AUTO_Right Coral Auto Align");
   Command AUTO_centerAutoAlignCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(m_robotDrive.alignWithPID(Constants.Direction.CENTER)), m_robotDrive).withName("AUTO_Center Coral Auto Align");
 
-  Command rotateRightCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, .3)), m_robotDrive);
-  Command rotateLeftCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, -.3)), m_robotDrive);
-  Command moveForwardCommand = new RunCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), m_robotDrive);
+  Command rotateRightCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, -0.3)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
+  Command rotateLeftCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0.3)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
+  Command moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   Command AUTO_moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0,0,0)), m_robotDrive);
 
   //Special Commands
 
   Command DEBUG_ElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setDEBUGElevatorPosition(), m_elevatorSubsystem).withName("DEBUG_ELEVATOR_COMMAND");
   Command DEBUG_WristCommand = Commands.runOnce(() -> m_coralSubsystem.setDEBUGWristAngle(), m_coralSubsystem).withName("DEBUG_WRIST_COMMAND");
-  Command DEBUG_AlgaeCommand = Commands.runOnce(() -> m_algaeSubsystem.setDEBUGWristAngle(), m_algaeSubsystem).withName("DEBUG_ALGAE_COMMAND");
+  //Command DEBUG_AlgaeCommand = Commands.runOnce(() -> m_algaeSubsystem.setDEBUGWristAngle(), m_algaeSubsystem).withName("DEBUG_ALGAE_COMMAND");
 
   // Pathplaner commands
 
@@ -271,8 +271,8 @@ public class RobotContainer {
     m_operatorController.leftBumper().whileTrue(intakeCoralCommand); // Eject coral with Left Bumper @OPERATOR
     m_operatorController.leftTrigger().whileTrue(ejectCoralCommand); // Intake coral with Left Trigger @OPERATOR
 
-    m_operatorController.rightBumper().whileTrue(intakeAlgaeCommand); // Eject Algae with Right Bumper @OPERATOR
-    m_operatorController.rightTrigger().whileTrue(ejectAlgaeCommand); // Intake Algae with Right Trigger @OPERATOR
+    //m_operatorController.rightBumper().whileTrue(intakeAlgaeCommand); // Eject Algae with Right Bumper @OPERATOR
+    //m_operatorController.rightTrigger().whileTrue(ejectAlgaeCommand); // Intake Algae with Right Trigger @OPERATOR
    
     m_operatorController.y().onTrue(l3CommandGroup); // Mover elevador y manipulador  en posicion del Nivel 3 del Arecife @OPERATOR
     m_operatorController.b().onTrue(l2CommandGroup); // Mover elevador y manipulador  en posicion del Nivel 2 del Arecife @OPERATOR
@@ -286,7 +286,7 @@ public class RobotContainer {
 
     m_operatorController.back().whileTrue(manualLiftCommand); // Iniciar modo manual del elevador @OPERATOR
     m_operatorController.back().whileFalse(stopManualLiftCommand); // Desactivar modo manual del elevador @OPERATOR
-    m_operatorController.start().onTrue(algaeWristCommand); // Poner el manipulador de Algae en posicion de operacion @OPERATOR
+    //m_operatorController.start().onTrue(algaeWristCommand); // Poner el manipulador de Algae en posicion de operacion @OPERATOR
   
     /**
      * 
@@ -383,11 +383,11 @@ public class RobotContainer {
     .withWidget(BuiltInWidgets.kCommand)
     .withSize(2, 1)
     .withPosition(2, 2);
-    ShuffleboardConstants.kAlgaeTab.add("DEBUG Algae Command", DEBUG_AlgaeCommand)
+    /*ShuffleboardConstants.kAlgaeTab.add("DEBUG Algae Command", DEBUG_AlgaeCommand)
     .withWidget(BuiltInWidgets.kCommand)
     .withSize(2, 1)
     .withPosition(2, 2);
-
+    */
     ShuffleboardConstants.kAutonomousTab.add("DEBUG Mode", OIConstants.kDebug)
     .withSize(1, 1)
     .withPosition(8, 0);

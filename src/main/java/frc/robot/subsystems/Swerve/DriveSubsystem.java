@@ -40,6 +40,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -223,11 +224,11 @@ public class DriveSubsystem extends SubsystemBase {
       getSwerveModulePositions(),
       new Pose2d(1.21, 5.53, getHeading())); // new Pose2d(1.21, 5.53, getHeading()
 
-  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(
+  private SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
       DriveConstants.kDriveKinematics,
-      getRotation2d(),
+      getHeading(),
       getSwerveModulePositions(),
-      new Pose2d(3.0, 7.0, getRotation2d()));
+      new Pose2d(3.0, 7.0, getHeading()));
 
   private Field2d field;
 
@@ -246,29 +247,23 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry Functions
 
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   public Rotation2d getRotation2d() {
-    return m_odometry.getPoseMeters().getRotation();
+    return m_poseEstimator.getEstimatedPosition().getRotation();
   }
 
   public void resetPose(Pose2d reseted) {
     m_odometry.resetPosition(
-        getRotation2d(),
+        getHeading(),
         getSwerveModulePositions(),
         reseted);
 
-    poseEstimator.resetPosition(
-        getRotation2d(),
+    m_poseEstimator.resetPosition(
+        getHeading(),
         getSwerveModulePositions(),
         reseted);
-  }
-
-  public void zeroPose() {
-    // m_odometry.resetPosition(getHeading(), getSwerveModulePositions(), new
-    // Pose2d(1.21, 5.53, getHeading()));
-    m_odometry.resetPosition(getHeading(), getSwerveModulePositions(), getPose());
   }
 
   // Relative Robot DriveSubsystem for Pathplanner
@@ -306,15 +301,6 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     setDesiredStates(swerveModuleStates);
 
-  }
-
-  // Misc
-
-  public void setX() {
-    m_frontLeft.setdesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    m_backLeft.setdesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_backLeft.setdesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_backRight.setdesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
   // Swerve Common Functions
@@ -361,7 +347,6 @@ public class DriveSubsystem extends SubsystemBase {
   double LEFT_CORAL_OFFSET = AutoAlignConstants.LEFT_CORAL_OFFSET;
   double RIGHT_CORAL_OFFSET = AutoAlignConstants.RIGHT_CORAL_OFFSET;
   private GenericEntry LEFT_OFFSET, RIGHT_OFFSET;
-  final double MECHANISM_X_OFFSET = 0.25; // meters
 
   {
     LEFT_OFFSET = ShuffleboardConstants.kDebugTab.add("Left Coral Offset", LEFT_CORAL_OFFSET)
@@ -401,8 +386,7 @@ public class DriveSubsystem extends SubsystemBase {
       coralTargetX = 0.0;
     }
 
-    double robotStrafeSetpoint = coralTargetX - MECHANISM_X_OFFSET;
-    robotStrafeSetpoint = coralTargetX;
+    double robotStrafeSetpoint = coralTargetX;
     alignPID_STRAFE.setSetpoint(robotStrafeSetpoint);
 
     double xSpeed = -alignPID_STRAFE.calculate(xMeters);
@@ -444,7 +428,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     alignPID_FOWARD.reset();
     alignPID_FOWARD.setTolerance(0.02);
-    alignPID_FOWARD.setSetpoint(1.3);
+    alignPID_FOWARD.setSetpoint(1); // Recommended 1.3 for more range
 
     alignPID_ROTATION.reset();
     alignPID_ROTATION.setTolerance(1.0);
@@ -469,12 +453,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Shuffleboard Gyro
     gyroLayout.addBoolean("Gyro Connected", () -> m_gyro.isConnected());
-    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("false_color", "4283215696"));
+    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", 0xffffcc00));
         // .withProperties(Map.of("Color when true", "4CAF50", "Color when false",
         // "#ffcc00"));
         //.withProperties(Map.of("false_color", "0xffffcc00"));
     gyroLayout.addBoolean("Field Oriented", () -> m_isFieldOriented);
-    gyroLayout.addDouble("Gyro Angle", () -> m_gyro.getAngle()).withWidget(BuiltInWidgets.kGyro);
+    gyroLayout.add("Gyro Angle", m_gyro).withWidget(BuiltInWidgets.kGyro);
 
     // Shuffleboard 2D Field
 
@@ -591,8 +575,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   private void updateVisionOdometry() {
     LimelightHelpers.PoseEstimate limelightMeasurments = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
-    if (limelightMeasurments.tagCount >= 2) {
-      poseEstimator.addVisionMeasurement(limelightMeasurments.pose, limelightMeasurments.timestampSeconds, VecBuilder.fill(0.7, 0.2, 999999));
+    System.out.println(limelightMeasurments.tagCount);
+    System.out.println("Robot time: " + Timer.getFPGATimestamp());
+    System.out.println("Vision timestamp: " + limelightMeasurments.timestampSeconds);
+    if (limelightMeasurments.tagCount >= 1) {
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
+      m_poseEstimator.addVisionMeasurement(limelightMeasurments.pose, limelightMeasurments.timestampSeconds);
     }
   }
 
@@ -601,27 +589,25 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Odometry Update
 
-    m_odometry.update(getHeading(), getSwerveModulePositions());
-
     if (!RobotBase.isSimulation()) {
       updateVisionOdometry();
     }
-    // poseEstimator.update(getRotation2d(), getSwerveModulePositions());
 
-    field.setRobotPose(m_odometry.getPoseMeters());
-    field.getObject("Pose Estimator").setPose(poseEstimator.getEstimatedPosition());
+    m_odometry.update(getHeading(), getSwerveModulePositions());
+    m_poseEstimator.update(getHeading(), getSwerveModulePositions());
+
+    field.setRobotPose(m_poseEstimator.getEstimatedPosition());
 
     // Publish Advantage Scope Data and Shuffleboard Data
 
     SwerveModuleState[] physicPoints = getSwerveModuleStates();
-
     SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
 
     publish_SwerveStates.set(physicPoints);
     publish_SwerverSetpoints.set(setPoints);
     publish_robotRotation.set(getRotation2d());
     publish_robotPose.set(getPose());
-    publish_poseEstimator.set(poseEstimator.getEstimatedPosition());
+    publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
 
   }
 
