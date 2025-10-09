@@ -3,9 +3,11 @@ package frc.robot;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
-import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.*;
 
 public final class Configs {
+
+  // REV Robotics Swerve Module Configuration @ By: REV Robotics
     public static final class BalamSwerveModule {
         public static final SparkMaxConfig drivingConfig = new SparkMaxConfig();
         public static final SparkMaxConfig turningConfig = new SparkMaxConfig();
@@ -50,6 +52,28 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
+        }
+    }
+    public static
+     final class AlgaeConfig {
+        public static final SparkMaxConfig primaryIntakeMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig secondaryIntakeMotorConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig algaeWristMotorConfig = new SparkMaxConfig();
+
+        static {
+            primaryIntakeMotorConfig
+                    .idleMode(Constants.AlgaeConstants.kPrimaryIdleMode)
+                    .smartCurrentLimit(Constants.AlgaeConstants.kPrimaryCurrentLimit);
+            secondaryIntakeMotorConfig
+                    .follow(Constants.AlgaeConstants.kPrimaryMotorId, true)
+                    .idleMode(Constants.AlgaeConstants.kSecondaryIdleMode)
+                    .smartCurrentLimit(Constants.AlgaeConstants.kSecondaryCurrentLimit);
+            algaeWristMotorConfig
+                    .idleMode(Constants.AlgaeConstants.kWristIdleMode)
+                    .smartCurrentLimit(Constants.AlgaeConstants.kWristCurrentLimit);
+            algaeWristMotorConfig.closedLoop
+                    .pidf(Constants.AlgaeConstants.kWristPIDkP, Constants.AlgaeConstants.kWristPIDkI,
+                            Constants.AlgaeConstants.kWristPIDkD, 0);
         }
     }
 }

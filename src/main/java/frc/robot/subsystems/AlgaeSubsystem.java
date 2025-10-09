@@ -32,7 +32,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -41,6 +40,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AlgaeConstants;
 import frc.robot.Constants.ShuffleboardConstants;
+import frc.robot.Configs;
 
 public class AlgaeSubsystem extends SubsystemBase {
 
@@ -49,10 +49,6 @@ public class AlgaeSubsystem extends SubsystemBase {
   private SparkMax m_AlgaeWristMotor;
 
   private AbsoluteEncoder m_encoder;
-
-  private static final SparkMaxConfig primaryIntakeMotorConfig = new SparkMaxConfig();
-  private static final SparkMaxConfig secondaryIntakeMotorConfig = new SparkMaxConfig();
-  private static final SparkMaxConfig algaeWristMotorConfig = new SparkMaxConfig();
 
   public boolean isEjectingAlgae = false;
   public boolean isIntakingAlgae = false;
@@ -64,23 +60,10 @@ public class AlgaeSubsystem extends SubsystemBase {
     m_PrimaryIntakeMotor = new SparkMax(AlgaeConstants.kPrimaryMotorId, MotorType.kBrushless);
     m_SecondaryIntakeMotor = new SparkMax(AlgaeConstants.kSecondaryMotorId, MotorType.kBrushless);
     m_AlgaeWristMotor = new SparkMax(AlgaeConstants.kWristMotorId, MotorType.kBrushless);
-
-    primaryIntakeMotorConfig
-    .idleMode(AlgaeConstants.kPrimaryIdleMode)
-    .smartCurrentLimit(AlgaeConstants.kPrimaryCurrentLimit);
-    secondaryIntakeMotorConfig
-    .follow(AlgaeConstants.kPrimaryMotorId, true)
-    .idleMode(AlgaeConstants.kSecondaryIdleMode)
-    .smartCurrentLimit(AlgaeConstants.kSecondaryCurrentLimit);
-    algaeWristMotorConfig
-    .idleMode(AlgaeConstants.kWristIdleMode)
-    .smartCurrentLimit(AlgaeConstants.kWristCurrentLimit);;
-    algaeWristMotorConfig.closedLoop
-    .pidf(AlgaeConstants.kWristPIDkP, AlgaeConstants.kWristPIDkI, AlgaeConstants.kWristPIDkD, 0);
     
-    m_PrimaryIntakeMotor.configure(primaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_SecondaryIntakeMotor.configure(secondaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_AlgaeWristMotor.configure(algaeWristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_PrimaryIntakeMotor.configure(Configs.AlgaeConfig.primaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_SecondaryIntakeMotor.configure(Configs.AlgaeConfig.secondaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_AlgaeWristMotor.configure(Configs.AlgaeConfig.algaeWristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     m_encoder = m_AlgaeWristMotor.getAbsoluteEncoder();
 
