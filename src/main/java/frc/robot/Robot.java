@@ -83,10 +83,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    if (OIConstants.kLEDController) {
-      ledChooser.getSelected().run();
-    }
-
+    
   }
 
   @Override
@@ -149,6 +146,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    if (OIConstants.kLEDController) {
+      ledChooser.getSelected().run();
+    }
   }
 
   @Override

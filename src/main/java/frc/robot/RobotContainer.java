@@ -49,6 +49,7 @@ import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.Constants.SpecialConstants;
 import frc.robot.commands.AutoEjectCommand;
 import frc.robot.commands.AutoIntakeCommand;
+import frc.robot.commands.MoveToSource;
 import frc.robot.subsystems.AlgaeSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CoralSubsystem;
@@ -113,7 +114,7 @@ public class RobotContainer {
   public final TejuinoBoard tejuino_board = new TejuinoBoard();
 
   // Time of Flight Sensor
-  private VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.25);;
+  private VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.3);
 
   /**
    * 
@@ -258,6 +259,10 @@ public class RobotContainer {
 
   private void configureBindings() {
 
+    // Overun Issue Fix?
+
+    
+
     //  --- Drive Controller Bindings --- //
     
     m_driverController.rightBumper().whileTrue(rotateRightCommand); // Rotate the robot right with the bumpers @DRIVER
@@ -325,7 +330,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
     NamedCommands.registerCommand("AlignLeftCoral", AUTO_leftAutoAlightCommand.withTimeout(2));
     NamedCommands.registerCommand("AlignRightCoral", AUTO_rightAutoAlightCommand.withTimeout(2));
-    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.until(() -> tof.getFilteredDistance() <= 400).withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardSource", new MoveToSource(m_robotDrive, tof, 0.5));
     
   }
 
@@ -400,10 +406,11 @@ public class RobotContainer {
     .withSize(1, 1)
     .withPosition(9, 0);
 
-    ShuffleboardConstants.kDriverTab.addNumber("TOF Distance", () -> tof.getSmoothDistance())
+    
+    ShuffleboardConstants.kDriverTab.addNumber("TOF Distance", () -> tof.getMedianDistance())
     .withSize(2, 1)
     .withPosition(0, 4);
-
+ 
   }
 
   /**

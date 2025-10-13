@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/*
+/**
  
 
 
@@ -18,19 +18,16 @@
   
 
 
-
-
-*/
-
-/*
  * VL53L0X Time-of-Flight Distance Sensor
  * Custom library for VL53L0X sensor using I2C communication
  * Based on the sensor's datasheet and application notes
- * Author: BALAM 3527
+ * @author BALAM 3527
+ * @version 1.0
  */
 
 package frc.robot.util;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -60,12 +57,6 @@ public class VL53L0X {
 
   private void writeReg(int reg, int value) {
     i2c.write(reg, value);
-  }
-
-  public double readWord(int reg) {
-    byte[] buffer = new byte[2];
-    i2c.read(reg, 2, buffer);
-    return ((buffer[0] & 0xFF) << 8) | (buffer[1] & 0xFF);
   }
 
   private void init() {
@@ -135,5 +126,33 @@ public class VL53L0X {
     for (double v : samples) sum += v;
     return sum / samples.size();
   }
+
+  private double getMedian(Queue<Double> data) {
+    if (data.isEmpty()) return 0;
+
+    Double[] arr = data.toArray(new Double[0]);
+    Arrays.sort(arr);
+    int middle = arr.length / 2;
+
+    if (arr.length % 2 == 0) {
+        // Even number of elements: average the two middle values
+        return (arr[middle - 1] + arr[middle]) / 2.0;
+    } else {
+        // Odd number of elements: return the middle value
+        return arr[middle];
+    }
+}
+
+public double getMedianDistance() {
+  double val = readRawDistance();
+
+  if (val > 20 && val < 2000) {
+      samples.add(val);
+      if (samples.size() > SAMPLE_SIZE) samples.poll();
+  }
+
+  return getMedian(samples);
+}
+
 
 }

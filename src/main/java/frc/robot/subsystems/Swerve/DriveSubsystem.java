@@ -278,6 +278,10 @@ public class DriveSubsystem extends SubsystemBase {
     setDesiredStates(newStates);
   }
 
+  public void stopChassis() {
+    setChassisSpeed(new ChassisSpeeds(0, 0, 0));
+  }
+
   // Relative and FieldOriented DriveSubsystem with Controller Inputs
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean overrideFieldOriented) {
@@ -574,13 +578,18 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void updateVisionOdometry() {
-    LimelightHelpers.PoseEstimate limelightMeasurments = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
-    System.out.println(limelightMeasurments.tagCount);
-    System.out.println("Robot time: " + Timer.getFPGATimestamp());
-    System.out.println("Vision timestamp: " + limelightMeasurments.timestampSeconds);
-    if (limelightMeasurments.tagCount >= 1) {
-      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
-      m_poseEstimator.addVisionMeasurement(limelightMeasurments.pose, limelightMeasurments.timestampSeconds);
+    boolean doRejectUpdate = false;
+    LimelightHelpers.SetRobotOrientation(CameraConstants.kLimelightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
+
+    if (mt2 == null) {
+      DriverStation.reportWarning("Limelight disconnected or not returning data", false);
+      return;
+    };
+    if(Math.abs(m_gyro.getRate()) > 720) doRejectUpdate = true;
+    if (!doRejectUpdate && mt2.tagCount >= 2) {
+      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, .9999999));
+      m_poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
     }
   }
 
