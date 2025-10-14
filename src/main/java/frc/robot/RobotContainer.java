@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
@@ -153,7 +154,7 @@ public class RobotContainer {
      * 
      */
 
-    m_robotDrive.setDefaultCommand(Commands.runOnce(
+    m_robotDrive.setDefaultCommand(new RunCommand(
       () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
@@ -240,8 +241,8 @@ public class RobotContainer {
   Command rotateLeftCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0.3)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   Command moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   Command AUTO_moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0,0,0)), m_robotDrive);
-
-  //Special Commands
+ 
+  // Special Commands
 
   Command DEBUG_ElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setDEBUGElevatorPosition(), m_elevatorSubsystem).withName("DEBUG_ELEVATOR_COMMAND");
   Command DEBUG_WristCommand = Commands.runOnce(() -> m_coralSubsystem.setDEBUGWristAngle(), m_coralSubsystem).withName("DEBUG_WRIST_COMMAND");
@@ -259,16 +260,13 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    // Overun Issue Fix?
-
-    
-
     //  --- Drive Controller Bindings --- //
     
     m_driverController.rightBumper().whileTrue(rotateRightCommand); // Rotate the robot right with the bumpers @DRIVER
     m_driverController.leftBumper().whileTrue(rotateLeftCommand); // Rotate the robot left with the bumpers @DRIVER
+    new Trigger(() -> m_driverController.getHID().getLeftBumperButton()).whileTrue(rotateLeftCommand);
 
-    m_driverController.x().whileTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading())); // Reset Gyro with X @DRIVER
+    m_driverController.x().onTrue(Commands.runOnce(() -> m_robotDrive.zeroHeading())); // Reset Gyro with X @DRIVER
     m_driverController.b().onTrue(m_robotDrive.changeDriveModeCmd()); // Change Drive Mode with B @DRIVER
 
     m_driverController.povLeft().whileTrue(leftAutoAlightCommand); // Align with Left Coral with the Cross Left @DRIVER
@@ -295,7 +293,7 @@ public class RobotContainer {
     m_operatorController.povUp().whileTrue(climbUpCommand); // Move the climber up with the cross Up @OPERATOR
 
     m_operatorController.back().whileTrue(manualLiftCommand); // Iniciar modo manual del elevador @OPERATOR
-    m_operatorController.back().whileFalse(stopManualLiftCommand); // Desactivar modo manual del elevador @OPERATOR
+    m_operatorController.back().whileFalse(stopManualLiftCommand.withTimeout(1)); // Desactivar modo manual del elevador @OPERATOR
     //m_operatorController.start().onTrue(algaeWristCommand); // Poner el manipulador de Algae en posicion de operacion @OPERATOR
   
     /**

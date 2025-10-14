@@ -27,15 +27,18 @@
 
 package frc.robot.util;
 
+import java.security.cert.LDAPCertStoreParameters;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SensorUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class VL53L0X {
+public class VL53L0X extends SubsystemBase{
   
   private static final int ADDRESS = 0x29;
   private I2C i2c;
@@ -72,6 +75,7 @@ public class VL53L0X {
         writeReg(0xFF, 0x00);
         writeReg(0x80, 0x00);
         Thread.sleep(10);
+        SmartDashboard.putString("VL53L0X", "Sensor initialized");
     } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
     }
@@ -120,6 +124,7 @@ public class VL53L0X {
     if (val > 20 && val < 2000) {
       samples.add(val);
       if (samples.size() > SAMPLE_SIZE) samples.poll();
+
     }
 
     double sum = 0;
@@ -152,6 +157,45 @@ public double getMedianDistance() {
   }
 
   return getMedian(samples);
+}
+
+public boolean isSensorAlive() {
+  double val = readRawDistance()
+  return val > 0 && val < 2000;
+}
+
+private double lastRaw = -1
+private double lastRawTime = 0;
+public boolean isSensorStuck() {
+  double now = Timer.getFPGATimestamp();
+  double val = readRawDistance();
+
+  if (val <= 0) return true; // Sensor alive
+  if (val == lastRaw) {
+    // If same readign persists > 0.2 seconds, consdier stuck
+    if (now - lastRawTime > 0.2) return true;
+  } else {
+    lastRaw = val;
+    lastRawTime = now;
+  }
+
+  return false;
+}
+
+private double lastResetTime = 0.0;
+@Override
+public void periodic() {
+  if (!isSensorAlive() || isSensorStuck()) {
+    double now = Timer.getFPGATimestamp();
+    if (now - lastResetTime > 1.0) {
+      SmartDashboard.putString("VL53L0X", "Disconnected");
+      init();
+      lastResetTime = now;
+      SmartDashboard.putString("VL53L0X", "Sensor re-initialized");
+    }
+  } else {
+    double val = 
+  }
 }
 
 

@@ -84,7 +84,7 @@ import edu.wpi.first.networktables.StructPublisher;
  * @author BALAM 3527
  * @version 1.24, 09/09/2025
  *
- *          Hours Consumed Coding This: ~32
+ *          Hours Consumed Coding This: ~56
  * 
  */
 
@@ -259,11 +259,13 @@ public class DriveSubsystem extends SubsystemBase {
         getHeading(),
         getSwerveModulePositions(),
         reseted);
-
-    m_poseEstimator.resetPosition(
+    if (visionPose() != null) {
+      m_poseEstimator.resetPosition(
         getHeading(),
         getSwerveModulePositions(),
-        reseted);
+        visionPose());
+    }
+    
   }
 
   // Relative Robot DriveSubsystem for Pathplanner
@@ -369,8 +371,9 @@ public class DriveSubsystem extends SubsystemBase {
   public ChassisSpeeds alignWithPID(Constants.Direction direction) {
 
     boolean tv = LimelightHelpers.getTV(CameraConstants.kLimelightName);
-    if (!tv) return new ChassisSpeeds(0, 0, 0);
-    
+    if (!tv)
+      return new ChassisSpeeds(0, 0, 0);
+
     double[] botpose = LimelightHelpers.getBotPose_TargetSpace(CameraConstants.kLimelightName);
     if (botpose == null || botpose.length < 2) {
       return new ChassisSpeeds(0, 0, 0);
@@ -457,10 +460,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Shuffleboard Gyro
     gyroLayout.addBoolean("Gyro Connected", () -> m_gyro.isConnected());
-    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox).withProperties(Map.of("colorWhenFalse", 0xffffcc00));
-        // .withProperties(Map.of("Color when true", "4CAF50", "Color when false",
-        // "#ffcc00"));
-        //.withProperties(Map.of("false_color", "0xffffcc00"));
+    gyroLayout.addBoolean("Gyro Calibrating", () -> m_gyro.isCalibrating()).withWidget(BuiltInWidgets.kBooleanBox)
+        .withProperties(Map.of("colorWhenFalse", 0xffffcc00));
+    // .withProperties(Map.of("Color when true", "4CAF50", "Color when false",
+    // "#ffcc00"));
+    // .withProperties(Map.of("false_color", "0xffffcc00"));
     gyroLayout.addBoolean("Field Oriented", () -> m_isFieldOriented);
     gyroLayout.add("Gyro Angle", m_gyro).withWidget(BuiltInWidgets.kGyro);
 
@@ -577,19 +581,68 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  private void updateVisionOdometry() {
+  private Pose2d visionPose() {
     boolean doRejectUpdate = false;
-    LimelightHelpers.SetRobotOrientation(CameraConstants.kLimelightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
+    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
 
-    if (mt2 == null) {
+    if (mt1 == null) {
       DriverStation.reportWarning("Limelight disconnected or not returning data", false);
-      return;
-    };
-    if(Math.abs(m_gyro.getRate()) > 720) doRejectUpdate = true;
-    if (!doRejectUpdate && mt2.tagCount >= 2) {
-      m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.6, .6, .9999999));
-      m_poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+      return null;
+    }
+
+    if (mt1.tagCount >= 2 && mt1.rawFiducials.length == 2) {
+      if (mt1.rawFiducials[0].ambiguity > 0.7) doRejectUpdate = true;
+      if (mt1.rawFiducials[0].distToCamera > 3) doRejectUpdate = true;
+    }
+    if (mt1.tagCount == 0) doRejectUpdate = true;
+
+    if (!doRejectUpdate) {
+      return new Pose2d(mt1.pose.getX(), mt1.pose.getY(), mt1.pose.getRotation());
+    }
+
+    return null;
+  }
+
+  private void updateVisionOdometry() {
+    m_poseEstimator.update(m_gyro.getRotation2d(), getSwerveModulePositions());
+
+    boolean useMegaTag2 = false;
+    boolean doRejectUpdate = false;
+
+    if (!useMegaTag2) {
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(CameraConstants.kLimelightName);
+
+      if (mt1 == null) {
+        DriverStation.reportWarning("Limelight disconnected or not returning data", false);
+        return;
+      }
+
+      if (mt1.tagCount >= 2 && mt1.rawFiducials.length == 2) {
+        if (mt1.rawFiducials[0].ambiguity > 0.7) doRejectUpdate = true;
+        if (mt1.rawFiducials[0].distToCamera > 3) doRejectUpdate = true;
+      }
+      if (mt1.tagCount == 0) doRejectUpdate = true;
+
+      if (!doRejectUpdate) {
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, .9999999));
+        m_poseEstimator.addVisionMeasurement(mt1.pose, mt1.timestampSeconds);
+      }
+    } else if (useMegaTag2) {
+        LimelightHelpers.SetRobotOrientation(CameraConstants.kLimelightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(CameraConstants.kLimelightName);
+
+        if (mt2 == null) {
+          DriverStation.reportWarning("Limelight disconnected or not returning data", false);
+          return;
+        }
+
+        if (Math.abs(m_gyro.getRate()) > 720) doRejectUpdate = true;
+        if (mt2.tagCount == 0) doRejectUpdate = true;
+
+        if (!doRejectUpdate && mt2.tagCount >= 2) {
+          m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, .9999999)); // .6 if .7 dosnt work
+          m_poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
+        }
     }
   }
 
@@ -602,21 +655,18 @@ public class DriveSubsystem extends SubsystemBase {
       updateVisionOdometry();
     }
 
-    m_odometry.update(getHeading(), getSwerveModulePositions());
-    m_poseEstimator.update(getHeading(), getSwerveModulePositions());
-
     field.setRobotPose(m_poseEstimator.getEstimatedPosition());
 
     // Publish Advantage Scope Data and Shuffleboard Data
 
-    SwerveModuleState[] physicPoints = getSwerveModuleStates();
-    SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
+    // SwerveModuleState[] physicPoints = getSwerveModuleStates();
+    // SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
 
-    publish_SwerveStates.set(physicPoints);
-    publish_SwerverSetpoints.set(setPoints);
-    publish_robotRotation.set(getRotation2d());
-    publish_robotPose.set(getPose());
-    publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
+    // publish_SwerveStates.set(physicPoints);
+    // publish_SwerverSetpoints.set(setPoints);
+    // publish_robotRotation.set(getRotation2d());
+    // publish_robotPose.set(getPose());
+    // publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
 
   }
 
