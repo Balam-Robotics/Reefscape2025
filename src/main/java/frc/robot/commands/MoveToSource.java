@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Swerve.DriveSubsystem;
 import frc.robot.util.VL53L0X;
@@ -15,8 +14,8 @@ public class MoveToSource extends Command {
 
   private final DriveSubsystem drive;
   private final VL53L0X sensor;
-  private final double targetMin = 300;
-  private final double targetMax = 307;
+  private final double targetMin = 270;
+  private final double targetMax = 276;
   private final double speed;
 
   /** Creates a new MoveToSource. */

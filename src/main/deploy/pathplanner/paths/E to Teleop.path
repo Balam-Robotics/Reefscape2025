@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.028653846153846,
-        "y": 2.776217948717948
+        "x": 1.452878289473684,
+        "y": 0.8690789473684208
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.040064102564101,
-        "y": 1.5893589743589736
+        "x": 2.4642885458839388,
+        "y": -0.3177800269905535
       },
       "isLocked": false,
       "linkedName": "Source to E"
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 270.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "Center Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -127.00000000000001
   },
   "useDefaultConstraints": true
 }

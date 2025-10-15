@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.4341609589041098,
-        "y": 2.3346104452054792
+        "x": 4.91339897260274,
+        "y": 2.4548159246575345
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.7953789076220588,
-        "y": 1.4160848041798384
+        "x": 5.274616921320688,
+        "y": 1.5362902836318937
       },
       "isLocked": false,
       "linkedName": "Middle to F"
     },
     {
       "anchor": {
-        "x": 1.3132692307692304,
-        "y": 0.7637179487179492
+        "x": 1.8932363013698632,
+        "y": 4.062564212328767
       },
       "prevControl": {
-        "x": 3.3670512820512757,
-        "y": 1.0939743589743594
+        "x": 3.9470183526519085,
+        "y": 4.392820622585177
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,7 +34,7 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 4.0,
-    "maxAcceleration": 4.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 270.0,
     "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -127.00000000000001
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Center Paths",

@@ -27,21 +27,20 @@
 
 package frc.robot.util;
 
-import java.security.cert.LDAPCertStoreParameters;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.SensorUtil;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ShuffleboardConstants;
 
-public class VL53L0X extends SubsystemBase{
+public class VL53L0X {
   
   private static final int ADDRESS = 0x29;
   private I2C i2c;
+  private I2C.Port port;
   
   private static final int SAMPLE_SIZE = 11;
   private final Queue<Double> samples = new LinkedList<>();
@@ -51,11 +50,18 @@ public class VL53L0X extends SubsystemBase{
   private double lastReadTime = 0.0;
   private final double readInterval = 0.02;
 
+  
+  public GenericEntry sensorStatus = ShuffleboardConstants.kDriverTab.add("VL53L0X", "STATUS")
+  .withSize(2, 1)
+  .withPosition(2, 4)
+  .getEntry();
+
   public VL53L0X(I2C.Port port, double smoothingFactor) {
     i2c = new I2C(port, ADDRESS);
+    this.port = port;
     this.alpha = smoothingFactor;
     init();
-        SmartDashboard.putString("VL53L0X", "Initialized on " + port.toString());
+        sensorStatus.setString("Initialized on " + port.toString());
   }
 
   private void writeReg(int reg, int value) {
@@ -75,9 +81,22 @@ public class VL53L0X extends SubsystemBase{
         writeReg(0xFF, 0x00);
         writeReg(0x80, 0x00);
         Thread.sleep(10);
-        SmartDashboard.putString("VL53L0X", "Sensor initialized");
+        sensorStatus.setString("Sensor initialized");
     } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
+    }
+  }
+
+  public void reinitializeSensor() {
+    sensorStatus.setString("Sensor re-initialized");
+    try {
+      i2c.close();
+      Timer.delay(0.05);
+      i2c = new I2C(this.port, ADDRESS);
+      init();
+      sensorStatus.setString("Sensor reconnected");
+    } catch (Exception e) {
+      sensorStatus.setString("Reconnnect failed: " + e.getMessage());
     }
   }
 
@@ -160,12 +179,14 @@ public double getMedianDistance() {
 }
 
 public boolean isSensorAlive() {
-  double val = readRawDistance()
-  return val > 0 && val < 2000;
+  double val = readRawDistance();
+  //System.out.println(val);
+  return val > 0;
 }
 
-private double lastRaw = -1
+private double lastRaw = -1;
 private double lastRawTime = 0;
+
 public boolean isSensorStuck() {
   double now = Timer.getFPGATimestamp();
   double val = readRawDistance();
@@ -181,22 +202,5 @@ public boolean isSensorStuck() {
 
   return false;
 }
-
-private double lastResetTime = 0.0;
-@Override
-public void periodic() {
-  if (!isSensorAlive() || isSensorStuck()) {
-    double now = Timer.getFPGATimestamp();
-    if (now - lastResetTime > 1.0) {
-      SmartDashboard.putString("VL53L0X", "Disconnected");
-      init();
-      lastResetTime = now;
-      SmartDashboard.putString("VL53L0X", "Sensor re-initialized");
-    }
-  } else {
-    double val = 
-  }
-}
-
 
 }

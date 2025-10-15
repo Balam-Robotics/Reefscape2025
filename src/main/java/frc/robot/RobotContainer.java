@@ -115,7 +115,7 @@ public class RobotContainer {
   public final TejuinoBoard tejuino_board = new TejuinoBoard();
 
   // Time of Flight Sensor
-  private VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.3);
+  public VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.3);
 
   /**
    * 
@@ -156,8 +156,8 @@ public class RobotContainer {
 
     m_robotDrive.setDefaultCommand(new RunCommand(
       () -> m_robotDrive.drive(
-        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
-        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+        MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kDriveDeadband), 
+        MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         false), 
       m_robotDrive).withName("Swerve Drive Command"));
@@ -241,6 +241,7 @@ public class RobotContainer {
   Command rotateLeftCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0.3)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   Command moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0, 0, 0)), m_robotDrive);
   Command AUTO_moveForwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0,0,0)), m_robotDrive);
+  Command AUTO_moveBackwardCommand = new StartEndCommand(() -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(-AutoConstants.kForwardSpeed, 0, 0)), () -> m_robotDrive.setChassisSpeed(new ChassisSpeeds(0,0,0)), m_robotDrive);
  
   // Special Commands
 
@@ -323,12 +324,13 @@ public class RobotContainer {
     NamedCommands.registerCommand("l3Command", l3CommandGroup);
     NamedCommands.registerCommand("resetCommand", resetCommandGroup);
     NamedCommands.registerCommand("sourceCommand", sourceCommandGroup);
-    NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(2));
-    NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(2));
+    NamedCommands.registerCommand("intakeCoral", new AutoIntakeCommand(m_coralSubsystem).withTimeout(2.5));
+    NamedCommands.registerCommand("ejectCoral", new AutoEjectCommand(m_coralSubsystem).withTimeout(2.5));
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
     NamedCommands.registerCommand("AlignLeftCoral", AUTO_leftAutoAlightCommand.withTimeout(2));
     NamedCommands.registerCommand("AlignRightCoral", AUTO_rightAutoAlightCommand.withTimeout(2));
-    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.85).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.5).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("BackwardCommand", AUTO_moveBackwardCommand.withTimeout(0.5).andThen(new WaitCommand(0.5)));
     NamedCommands.registerCommand("ForwardSource", new MoveToSource(m_robotDrive, tof, 0.5));
     
   }

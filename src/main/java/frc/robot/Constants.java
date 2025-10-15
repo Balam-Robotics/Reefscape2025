@@ -311,7 +311,7 @@ public final class Constants {
   public static final class SpecialConstants {
     public static final double SOURCE_HEIGHT = 21.5; // 20
     public static final double L1_HEIGHT = 0;
-    public static final double L2_HEIGHT = 35;
+    public static final double L2_HEIGHT = 40;
     public static final double L3_HEIGHT = 55;
 
     public static final double DEFAULT_ANGLE = 0;
@@ -323,8 +323,8 @@ public final class Constants {
   }
 
   public static final class AutoAlignConstants {
-    public static final double RIGHT_CORAL_OFFSET = 0.20;
-    public static final double LEFT_CORAL_OFFSET = -0.2;
+    public static final double RIGHT_CORAL_OFFSET = 0.10;
+    public static final double LEFT_CORAL_OFFSET = -0.21;
 
     public static final double MAX_SPEED = 1;
     public static final double MAX_ROTATION_SPEED = 1;

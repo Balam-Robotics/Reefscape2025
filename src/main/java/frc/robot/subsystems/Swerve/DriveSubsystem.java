@@ -40,7 +40,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -163,6 +162,7 @@ public class DriveSubsystem extends SubsystemBase {
       .getStructTopic("/Odometry/PoseEstimation", Pose2d.struct).publish();
 
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
+  {m_gyro.setAngleAdjustment(180);}
 
   private ShuffleboardLayout gyroLayout = ShuffleboardConstants.kDriverTab
       .getLayout("Gyro Data", BuiltInLayouts.kList)
@@ -382,7 +382,7 @@ public class DriveSubsystem extends SubsystemBase {
     double xMeters = botpose[0];
     double yMeters = botpose[2];
     double currentYaw = botpose[4];
-    System.out.printf("X: %s.2f, Y: %s.2f, Z: %s", xMeters, yMeters, currentYaw);
+    //System.out.printf("X: %s.2f, Y: %s.2f, Z: %s", xMeters, yMeters, currentYaw);
 
     double coralTargetX = 0.0;
     if (direction == Constants.Direction.RIGHT) {
@@ -606,7 +606,7 @@ public class DriveSubsystem extends SubsystemBase {
   private void updateVisionOdometry() {
     m_poseEstimator.update(m_gyro.getRotation2d(), getSwerveModulePositions());
 
-    boolean useMegaTag2 = false;
+    boolean useMegaTag2 = true;
     boolean doRejectUpdate = false;
 
     if (!useMegaTag2) {
@@ -617,7 +617,7 @@ public class DriveSubsystem extends SubsystemBase {
         return;
       }
 
-      if (mt1.tagCount >= 2 && mt1.rawFiducials.length == 2) {
+      if (mt1.tagCount == 1 && mt1.rawFiducials.length == 1) {
         if (mt1.rawFiducials[0].ambiguity > 0.7) doRejectUpdate = true;
         if (mt1.rawFiducials[0].distToCamera > 3) doRejectUpdate = true;
       }
@@ -639,7 +639,7 @@ public class DriveSubsystem extends SubsystemBase {
         if (Math.abs(m_gyro.getRate()) > 720) doRejectUpdate = true;
         if (mt2.tagCount == 0) doRejectUpdate = true;
 
-        if (!doRejectUpdate && mt2.tagCount >= 2) {
+        if (!doRejectUpdate && mt2.tagCount >= 1) {
           m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, .9999999)); // .6 if .7 dosnt work
           m_poseEstimator.addVisionMeasurement(mt2.pose, mt2.timestampSeconds);
         }
@@ -659,14 +659,14 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Publish Advantage Scope Data and Shuffleboard Data
 
-    // SwerveModuleState[] physicPoints = getSwerveModuleStates();
-    // SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
+    SwerveModuleState[] physicPoints = getSwerveModuleStates();
+    SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
 
-    // publish_SwerveStates.set(physicPoints);
-    // publish_SwerverSetpoints.set(setPoints);
-    // publish_robotRotation.set(getRotation2d());
-    // publish_robotPose.set(getPose());
-    // publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
+    publish_SwerveStates.set(physicPoints);
+    publish_SwerverSetpoints.set(setPoints);
+    publish_robotRotation.set(getRotation2d());
+    publish_robotPose.set(getPose());
+    publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
 
   }
 
