@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ShuffleboardConstants;
+import frc.robot.Constants.SpecialConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
 

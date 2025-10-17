@@ -83,10 +83,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    if (!m_robotContainer.tof.isSensorAlive()) {
-      //m_robotContainer.tof.sensorStatus.setString("Disconnected");
-      //m_robotContainer.tof.reinitializeSensor();
-    }
   }
 
   @Override

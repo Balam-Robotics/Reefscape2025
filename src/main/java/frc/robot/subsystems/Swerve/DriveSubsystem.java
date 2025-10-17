@@ -162,7 +162,7 @@ public class DriveSubsystem extends SubsystemBase {
       .getStructTopic("/Odometry/PoseEstimation", Pose2d.struct).publish();
 
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
-  {m_gyro.setAngleAdjustment(180);}
+  {m_gyro.setAngleAdjustment(185);}
 
   private ShuffleboardLayout gyroLayout = ShuffleboardConstants.kDriverTab
       .getLayout("Gyro Data", BuiltInLayouts.kList)
@@ -230,7 +230,7 @@ public class DriveSubsystem extends SubsystemBase {
       getSwerveModulePositions(),
       new Pose2d(3.0, 7.0, getHeading()));
 
-  private Field2d field;
+  private Field2d field, field2;
 
   // ----------------- Drive Subsystem Functions -----------------
 
@@ -435,7 +435,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     alignPID_FOWARD.reset();
     alignPID_FOWARD.setTolerance(0.02);
-    alignPID_FOWARD.setSetpoint(1); // Recommended 1.3 for more range
+    alignPID_FOWARD.setSetpoint(1.3); // Recommended 1.3 for more range
 
     alignPID_ROTATION.reset();
     alignPID_ROTATION.setTolerance(1.0);
@@ -471,10 +471,12 @@ public class DriveSubsystem extends SubsystemBase {
     // Shuffleboard 2D Field
 
     field = new Field2d();
+    field2 = new Field2d();
     ShuffleboardConstants.kDriverTab.add("Field", field)
         .withSize(3, 2)
         .withPosition(8, 3);
-    ShuffleboardConstants.kAutonomousTab.add("Autonomous Field", field)
+        
+    ShuffleboardConstants.kAutonomousTab.add("Autonomous Field", field2)
         .withSize(4, 3)
         .withPosition(6, 1);
 
@@ -656,18 +658,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+    field2.setRobotPose(m_poseEstimator.getEstimatedPosition());
 
     // Publish Advantage Scope Data and Shuffleboard Data
 
     SwerveModuleState[] physicPoints = getSwerveModuleStates();
     SwerveModuleState[] setPoints = getSwerveModuleSetpoints();
-
+/*
     publish_SwerveStates.set(physicPoints);
     publish_SwerverSetpoints.set(setPoints);
     publish_robotRotation.set(getRotation2d());
     publish_robotPose.set(getPose());
     publish_poseEstimator.set(m_poseEstimator.getEstimatedPosition());
-
+ */
   }
 
 }

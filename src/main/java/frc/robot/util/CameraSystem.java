@@ -17,53 +17,49 @@ import frc.robot.Constants.ShuffleboardConstants;;
 
 @SuppressWarnings("unused")
 public class CameraSystem extends SubsystemBase {
-  private UsbCamera usbCamera, usbCamera2;
-  private MjpegServer mjpegServer1, mjpegServer2, mjpegServerLimelight;
+  private UsbCamera usbCameraFront, usbCameraCage;
+  private HttpCamera limelightCamera;
 
   public void init() {
-    // Start capturing first USB Camera
-    usbCamera = CameraServer.startAutomaticCapture(0);
-    usbCamera.setResolution(320, 240);
-    usbCamera.setFPS(30);
-    usbCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-
-    // Start capturing second USB Camera
-    usbCamera2 = CameraServer.startAutomaticCapture(1);
-    usbCamera2.setResolution(320, 240);
-    usbCamera2.setFPS(30);
-    usbCamera2.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    try {
+      usbCameraFront = CameraServer.startAutomaticCapture(0);
+      usbCameraFront.setResolution(320, 240);
+      usbCameraFront.setFPS(30);
+      System.out.println("[CameraSystem] Front camera started!");
+  } catch (Exception e) {
+      System.out.println("[CameraSystem] Front camera not detected: " + e.getMessage());
+  }
+  
+  /*
+  try {
+      usbCameraCage = CameraServer.startAutomaticCapture(1);
+      usbCameraCage.setResolution(320, 240);
+      usbCameraCage.setFPS(30);
+      System.out.println("[CameraSystem] Cage camera started!");
+  } catch (Exception e) {
+      System.out.println("[CameraSystem] Cage camera not detected: " + e.getMessage());
+  } */
 
     // Start capturing from the Limelight camera
-    HttpCamera limelightCamera = new HttpCamera(CameraConstants.kLimelightName,
-        "http://roborio-3527-frc.local:1183/stream.mjpg");
+    limelightCamera = new HttpCamera(CameraConstants.kLimelightName,
+        "http://roborio-3527-frc.local:5800/stream.mjpg");
 
-    // Start camera server
-    mjpegServer1 = new MjpegServer("server_usb Camera 0", 1181);
-    mjpegServer1.setSource(usbCamera);
-
-    mjpegServer2 = new MjpegServer("server_usb Camera 1", 1182);
-    mjpegServer2.setSource(usbCamera2);
-
-    // Start second sercer
-    mjpegServerLimelight = new MjpegServer("server_Limelight", 1183);
-    mjpegServerLimelight.setSource(limelightCamera);
-
-    ShuffleboardConstants.kDriverTab.add("Limelight Camera", mjpegServerLimelight.getSource())
+    ShuffleboardConstants.kDriverTab.add("Limelight Camera", limelightCamera)
         .withWidget(BuiltInWidgets.kCameraStream)
         .withPosition(2, 0)
         .withSize(2, 2);
-    ShuffleboardConstants.kDriverTab.add("Front Camera", mjpegServer1.getSource())
+    ShuffleboardConstants.kDriverTab.add("Front Camera", usbCameraFront)
         .withWidget(BuiltInWidgets.kCameraStream)
         .withPosition(2, 2)
-        .withSize(2, 2);
-    ShuffleboardConstants.kDriverTab.add("Cage Stream", mjpegServer2.getSource())
+        .withSize(2, 2);/*
+    ShuffleboardConstants.kDriverTab.add("Cage Stream", usbCameraCage)
         .withWidget(BuiltInWidgets.kCameraStream)
         .withPosition(4, 2)
-        .withSize(2, 2);
+        .withSize(2, 2); */
 
     // Autonomus Elastic Tab
 
-    ShuffleboardConstants.kAutonomousTab.add("Limelight Stream", mjpegServerLimelight.getSource())
+    ShuffleboardConstants.kAutonomousTab.add("Limelight Stream", limelightCamera)
         .withWidget(BuiltInWidgets.kCameraStream)
         .withPosition(0, 0)
         .withSize(4, 4);

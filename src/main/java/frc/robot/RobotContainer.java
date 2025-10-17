@@ -27,10 +27,12 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -40,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -115,7 +118,7 @@ public class RobotContainer {
   public final TejuinoBoard tejuino_board = new TejuinoBoard();
 
   // Time of Flight Sensor
-  public VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.3);
+  //public VL53L0X tof =  new VL53L0X(I2C.Port.kOnboard, 0.3);
 
   /**
    * 
@@ -200,7 +203,7 @@ public class RobotContainer {
 
   // Reset Elevator Position 
 
-  Command resetElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(0), m_elevatorSubsystem).withName("Reset Elevator Command");
+  Command resetElevatorCommand = Commands.runOnce(() -> m_elevatorSubsystem.setElevatorPosition(SpecialConstants.DEFAULT_HEIGHT), m_elevatorSubsystem).withName("Reset Elevator Command");
   Command resetWristCommand = Commands.runOnce(() -> m_coralSubsystem.setWristAngle(SpecialConstants.DEFAULT_ANGLE), m_coralSubsystem).withName("Reset Wrist Command");
   ParallelCommandGroup resetCommandGroup = new ParallelCommandGroup(resetElevatorCommand, resetWristCommand);
 
@@ -329,9 +332,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("resetGyro", resetGyroCommand);
     NamedCommands.registerCommand("AlignLeftCoral", AUTO_leftAutoAlightCommand.withTimeout(2));
     NamedCommands.registerCommand("AlignRightCoral", AUTO_rightAutoAlightCommand.withTimeout(2));
-    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(.5).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
+    NamedCommands.registerCommand("ForwardCommand", AUTO_moveForwardCommand.withTimeout(1).andThen(new WaitCommand(0.85).andThen(new AutoEjectCommand(m_coralSubsystem).withTimeout(0.5))));;
     NamedCommands.registerCommand("BackwardCommand", AUTO_moveBackwardCommand.withTimeout(0.5).andThen(new WaitCommand(0.5)));
-    NamedCommands.registerCommand("ForwardSource", new MoveToSource(m_robotDrive, tof, 0.5));
     
   }
 
@@ -347,13 +349,16 @@ public class RobotContainer {
 
     // --- Drive Tab --- //
     
+    GameTimer test = new GameTimer();
+    SendableRegistry.add(test, "test");
     GameTimer gameTimer = new GameTimer();
     SendableRegistry.add(gameTimer, "Match Time");
-    ShuffleboardConstants.kDriverTab.add(gameTimer)
+
+    ShuffleboardConstants.kDriverTab.addNumber("Match Time", () -> Timer.getMatchTime())
     .withWidget("Match Time")
-    .withProperties(Map.of("Font color", "black"))
+    //.withProperties(Map.of("Font color", "black"))
     .withSize(2, 1)
-    .withPosition(4, 4);
+    .withPosition(0, 4);
 
     ShuffleboardLayout robotSubsystems = ShuffleboardConstants.kDriverTab
     .getLayout("Robot Subsystems", BuiltInLayouts.kList)
@@ -406,11 +411,11 @@ public class RobotContainer {
     .withSize(1, 1)
     .withPosition(9, 0);
 
-    
+    /*
     ShuffleboardConstants.kDriverTab.addNumber("TOF Distance", () -> tof.getMedianDistance())
     .withSize(2, 1)
     .withPosition(0, 4);
- 
+     */
   }
 
   /**

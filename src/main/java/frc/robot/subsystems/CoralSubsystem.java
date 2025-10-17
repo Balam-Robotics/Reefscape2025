@@ -85,6 +85,10 @@ public class CoralSubsystem extends SubsystemBase {
     m_wristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
+  public void setWristSpeed(double speed) {
+    m_wristMotor.set(speed);
+  }
+
   public void setDEBUGWristAngle() {
     m_wristMotor.getClosedLoopController().setReference(wristPIDEntry.getDouble(0.0), ControlType.kPosition);
   }

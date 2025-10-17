@@ -11,7 +11,8 @@ public class GameTimer implements Sendable {
 
     @Override  
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("GameTimer");
+        builder.setSmartDashboardType("Match Time");
         builder.addDoubleProperty("Match Time", Timer::getMatchTime, null);
+        builder.addBooleanProperty("Endgame", () -> Timer.getMatchTime() <= 15, null);
     }
 }
