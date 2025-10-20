@@ -7,49 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "sourceCommand"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "resetCommand"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Source to B"
+            "pathName": "Left to E"
           }
         },
         {
@@ -61,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignRightCoral"
+            "name": "AlignLeftCoral"
           }
         },
         {
@@ -73,7 +31,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.5
           }
         },
         {
@@ -81,11 +39,59 @@
           "data": {
             "name": "resetCommand"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackwardCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F to source 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeCoral"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "source 2 to K"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeftCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l2Command"
+          }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

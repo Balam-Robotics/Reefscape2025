@@ -10,10 +10,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.util.Elastic;
 import frc.robot.util.ElasticNotification;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.TejuinoBoard;
 
 public class Robot extends TimedRobot {
@@ -26,6 +28,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    LimelightHelpers.setLEDMode_ForceOff(CameraConstants.kLimelightName);
     m_robotContainer = new RobotContainer();
     DataLogManager.start();
 

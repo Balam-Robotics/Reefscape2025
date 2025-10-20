@@ -18,8 +18,8 @@
 
 
 
+*/
 
-*/      
 
 package frc.robot.subsystems;
 
@@ -47,6 +47,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public static final SparkMaxConfig secondaryMotorConfig = new SparkMaxConfig();
 
   /** Creates a new ClimberSubsystem. */
+  
+  
   public ClimberSubsystem() {
 
     m_primaryMotor = new SparkMax(ClimberConstants.kPrimaryMotorId, MotorType.kBrushless);
@@ -115,3 +117,4 @@ public class ClimberSubsystem extends SubsystemBase {
     secondaryMotorCurrent.setDouble(m_secondaryMotor.getOutputCurrent());
   }
 }
+

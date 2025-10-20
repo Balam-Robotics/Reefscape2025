@@ -162,7 +162,14 @@ public class DriveSubsystem extends SubsystemBase {
       .getStructTopic("/Odometry/PoseEstimation", Pose2d.struct).publish();
 
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
-  {m_gyro.setAngleAdjustment(185);}
+  {
+    if (!RobotBase.isSimulation()) {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.get() == DriverStation.Alliance.Blue) {
+      m_gyro.setAngleAdjustment(180);
+    }
+  }
+  }
 
   private ShuffleboardLayout gyroLayout = ShuffleboardConstants.kDriverTab
       .getLayout("Gyro Data", BuiltInLayouts.kList)

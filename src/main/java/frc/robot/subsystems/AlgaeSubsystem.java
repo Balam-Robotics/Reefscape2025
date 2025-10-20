@@ -20,13 +20,14 @@
 
 
 
-*/    
+   */
 
 package frc.robot.subsystems;
 
 import java.util.Map;
 
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -46,46 +47,49 @@ public class AlgaeSubsystem extends SubsystemBase {
 
   private SparkMax m_PrimaryIntakeMotor;
   private SparkMax m_SecondaryIntakeMotor;
-  private SparkMax m_AlgaeWristMotor;
 
-  private AbsoluteEncoder m_encoder;
+  private SparkMax m_PrimaryAlgaeWristMotor; 
+  private SparkMax m_SecondaryAlgaeWristMotor; 
+
+  private RelativeEncoder m_encoder;
+
+  public boolean isWristMoving = false;
 
   public boolean isEjectingAlgae = false;
   public boolean isIntakingAlgae = false;
-  public boolean isWristMoving = false;
 
   /** Creates a new AlgaeSubsystem. */
   public AlgaeSubsystem() {
 
-    m_PrimaryIntakeMotor = new SparkMax(AlgaeConstants.kPrimaryMotorId, MotorType.kBrushless);
-    m_SecondaryIntakeMotor = new SparkMax(AlgaeConstants.kSecondaryMotorId, MotorType.kBrushless);
-    m_AlgaeWristMotor = new SparkMax(AlgaeConstants.kWristMotorId, MotorType.kBrushless);
-    
+    m_PrimaryIntakeMotor = new SparkMax(AlgaeConstants.kPrimaryIntakeMotorId, MotorType.kBrushless);
+    m_SecondaryIntakeMotor = new SparkMax(AlgaeConstants.kSecondaryIntakeMotorId, MotorType.kBrushless);
+    m_PrimaryAlgaeWristMotor = new SparkMax(AlgaeConstants.kPrimaryWristMotorId, MotorType.kBrushless);
+    m_SecondaryAlgaeWristMotor = new SparkMax(AlgaeConstants.kSecondaryWristMotorId, MotorType.kBrushless); 
+
     m_PrimaryIntakeMotor.configure(Configs.AlgaeConfig.primaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_SecondaryIntakeMotor.configure(Configs.AlgaeConfig.secondaryIntakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_AlgaeWristMotor.configure(Configs.AlgaeConfig.algaeWristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_PrimaryAlgaeWristMotor.configure(Configs.AlgaeConfig.primaryAlgaeWristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_SecondaryAlgaeWristMotor.configure(Configs.AlgaeConfig.secondaryAlgaeWristMotorCongif, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters); 
 
-    m_encoder = m_AlgaeWristMotor.getAbsoluteEncoder();
+    m_encoder = m_PrimaryAlgaeWristMotor.getEncoder();
 
   }
 
   public void setWristAngle(double position) {
-    m_AlgaeWristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
+    m_PrimaryAlgaeWristMotor.getClosedLoopController().setReference(position, ControlType.kPosition);
   }
 
   public void setDEBUGWristAngle() {
-    m_AlgaeWristMotor.getClosedLoopController().setReference(algaePIDEntry.getDouble(0.0), ControlType.kPosition);
+    m_PrimaryAlgaeWristMotor.getClosedLoopController().setReference(algaePIDEntry.getDouble(0.0), ControlType.kPosition);
   }
 
   public void setWristSpeed(double speed) {
     // TODO: TEST LIMITS SUPPORT
-    if (speed > 0 && getEncoderPosition() >= AlgaeConstants.kWristMaxPosition) {
-      m_AlgaeWristMotor.set(0); // Stop the motor if exceeding max position
-    } else if (speed < 0 && getEncoderPosition() <= AlgaeConstants.kWristMinPosition) {
-      m_AlgaeWristMotor.set(0); // Stop the motor if below min position
-    } else {
-      m_AlgaeWristMotor.set(speed); // Set the motor speed if within limits
-    }
+    m_PrimaryIntakeMotor.set(speed);
+  }
+
+  public void stopWrist() {
+    m_PrimaryIntakeMotor.set(0);
   }
 
   private GenericEntry algaePIDEntry = ShuffleboardConstants.kAlgaeTab.add("Algae PID", 0.0)
@@ -158,8 +162,11 @@ public class AlgaeSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     algaePosition.setDouble(getEncoderPosition());
     algaeVelocity.setDouble(getEncoderVelocity());
-    wristVoltage.setDouble(m_AlgaeWristMotor.getOutputCurrent());
+    wristVoltage.setDouble(m_PrimaryAlgaeWristMotor.getOutputCurrent());
     algaeVoltage.setDouble(m_PrimaryIntakeMotor.getOutputCurrent());
-    //System.out.println(Units.radiansToDegrees(getEncoderPosition()));
   }
 }
+
+
+
+

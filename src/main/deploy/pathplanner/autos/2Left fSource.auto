@@ -7,25 +7,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
+            "pathName": "Left to E"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "sourceCommand"
+            "name": "l2Command"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignLeftCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForwardCommand"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "resetCommand"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackwardCommand"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "E to source"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "l2Command"
           }
         },
         {
@@ -37,7 +67,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.0
           }
         },
         {
@@ -49,7 +79,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source to B"
+            "pathName": "Source to D"
           }
         },
         {
@@ -83,51 +113,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "B To Source"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "sourceCommand"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "intakeCoral"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "resetCommand"
+            "name": "BackwardCommand"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Source to B"
+            "pathName": "D to source"
           }
         },
         {
@@ -135,35 +129,11 @@
           "data": {
             "name": "l2Command"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignLeftCoral"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ForwardCommand"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "resetCommand"
-          }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

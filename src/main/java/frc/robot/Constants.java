@@ -200,8 +200,8 @@ public final class Constants {
     public static final ShuffleboardTab kAutonomousTab = Shuffleboard.getTab("Autonomous");
     public static final ShuffleboardTab kCoralTab = Shuffleboard.getTab("Coral");
     public static final ShuffleboardTab kElevatorTab = Shuffleboard.getTab("Elevator");
-    public static final ShuffleboardTab kClimberTab = Shuffleboard.getTab("Climber");
     public static final ShuffleboardTab kAlgaeTab = Shuffleboard.getTab("Algae");
+    public static final ShuffleboardTab kClimberTab = Shuffleboard.getTab("Climber");
     public static final ShuffleboardTab kDebugTab = Shuffleboard.getTab("Debug");
     public static final ShuffleboardTab kTestTab = Shuffleboard.getTab("Align PID Tuning");
   }
@@ -260,16 +260,16 @@ public final class Constants {
    */
 
   public static final class AlgaeConstants {
-    public static final int kPrimaryMotorId = 5;
-    public static final int kSecondaryMotorId = 6;
-    public static final int kWristMotorId = 7;
+    public static final int kPrimaryIntakeMotorId = 5;
+    public static final int kSecondaryIntakeMotorId = 6;
 
-    public static final int kPrimaryCurrentLimit = 15;
-    public static final int kSecondaryCurrentLimit = 15;
-    public static final int kWristCurrentLimit = 20;
+    public static final int kPrimaryWristMotorId = 7;
+    public static final int kSecondaryWristMotorId = 8; 
 
-    public static final IdleMode kPrimaryIdleMode = IdleMode.kCoast;
-    public static final IdleMode kSecondaryIdleMode = IdleMode.kCoast;
+    public static final int kIntakeMotorCurrentLimit = 15;
+    public static final int kWristMotorCurrentLimit = 20;
+
+    public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
     public static final IdleMode kWristIdleMode = IdleMode.kBrake;
 
     public static final double kWristMaxPosition = 0.0;
@@ -312,20 +312,20 @@ public final class Constants {
     public static final double DEFAULT_HEIGHT = 0.0;
     public static final double SOURCE_HEIGHT = 21.5; // 20
     public static final double L1_HEIGHT = 0;
-    public static final double L2_HEIGHT = 40;
+    public static final double L2_HEIGHT = 37;
     public static final double L3_HEIGHT = 55;
 
     public static final double DEFAULT_ANGLE = 0.0;
     public static final double SOURCE_ANGLE = 1.2; // 1.5
     public static final double L1_ANGLE = 4;
     public static final double L2_ANGLE = 4;
-    public static final double L3_ANGLE = 4;
+    public static final double L3_ANGLE = 2.9;
 
   }
 
   public static final class AutoAlignConstants {
-    public static final double RIGHT_CORAL_OFFSET = 0.30;
-    public static final double LEFT_CORAL_OFFSET = -0.04;
+    public static final double RIGHT_CORAL_OFFSET = 0.21;
+    public static final double LEFT_CORAL_OFFSET = -0.14;
 
     public static final double MAX_SPEED = 1;
     public static final double MAX_ROTATION_SPEED = 1;

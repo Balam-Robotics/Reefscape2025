@@ -70,20 +70,26 @@ public final class Configs {
   public static final class AlgaeConfig {
     public static final SparkMaxConfig primaryIntakeMotorConfig = new SparkMaxConfig();
     public static final SparkMaxConfig secondaryIntakeMotorConfig = new SparkMaxConfig();
-    public static final SparkMaxConfig algaeWristMotorConfig = new SparkMaxConfig();
 
+    public static final SparkMaxConfig primaryAlgaeWristMotorConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig secondaryAlgaeWristMotorCongif = new SparkMaxConfig();
     static {
       primaryIntakeMotorConfig
-          .idleMode(Constants.AlgaeConstants.kPrimaryIdleMode)
-          .smartCurrentLimit(Constants.AlgaeConstants.kPrimaryCurrentLimit);
+          .idleMode(Constants.AlgaeConstants.kIntakeIdleMode)
+          .smartCurrentLimit(Constants.AlgaeConstants.kIntakeMotorCurrentLimit);
       secondaryIntakeMotorConfig
-          .follow(Constants.AlgaeConstants.kPrimaryMotorId, true)
-          .idleMode(Constants.AlgaeConstants.kSecondaryIdleMode)
-          .smartCurrentLimit(Constants.AlgaeConstants.kSecondaryCurrentLimit);
-      algaeWristMotorConfig
+          .follow(Constants.AlgaeConstants.kPrimaryIntakeMotorId, true)
+          .idleMode(Constants.AlgaeConstants.kIntakeIdleMode)
+          .smartCurrentLimit(Constants.AlgaeConstants.kIntakeMotorCurrentLimit);
+
+      primaryAlgaeWristMotorConfig
           .idleMode(Constants.AlgaeConstants.kWristIdleMode)
-          .smartCurrentLimit(Constants.AlgaeConstants.kWristCurrentLimit);
-      algaeWristMotorConfig.closedLoop
+          .smartCurrentLimit(Constants.AlgaeConstants.kWristMotorCurrentLimit);
+      secondaryAlgaeWristMotorCongif
+          .follow(Constants.AlgaeConstants.kPrimaryWristMotorId, true)
+          .idleMode(Constants.AlgaeConstants.kWristIdleMode)
+          .smartCurrentLimit(Constants.AlgaeConstants.kWristMotorCurrentLimit);
+          primaryAlgaeWristMotorConfig.closedLoop
           .pidf(Constants.AlgaeConstants.kWristPIDkP, Constants.AlgaeConstants.kWristPIDkI,
               Constants.AlgaeConstants.kWristPIDkD, 0);
     }

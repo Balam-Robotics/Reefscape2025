@@ -7,13 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "BackwardCommand"
+            "name": "AlignRightCoral"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "B To Source"
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ForwardCommand"
           }
         }
       ]
